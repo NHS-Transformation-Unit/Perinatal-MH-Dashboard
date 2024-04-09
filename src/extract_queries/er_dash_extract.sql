@@ -1,124 +1,7 @@
 
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-PERINATAL DASHBOARD 
-
-CREATED BY LOUISE SHUTTLEWORTH 16/09/21
-
-ASSET: MHSDS DATA TABLES 
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
---SET VARIABLE
-
-DECLARE @EndRP INT
-DECLARE @FYStart INT
-DECLARE @LatestPerformanceSub INT
-DECLARE @StartRP INT
-DECLARE @RPEndDate DATETIME
-DECLARE @RPEndDatePerformance DATETIME
-
-SET @FYStart = 
-(SELECT MAX(UniqMonthID)
-FROM [NHSE_Sandbox_MentalHealth].[dbo].[PreProc_Header]
-WHERE Der_FYStart = 'Y')
-
-SET @EndRP = 
-(SELECT UniqMonthID
-FROM [NHSE_Sandbox_MentalHealth].[dbo].[PreProc_Header]
-WHERE Der_MostRecentFlag = 'P')
-
-SET @LatestPerformanceSub = 
-(SELECT UniqMonthID
-FROM [NHSE_Sandbox_MentalHealth].[dbo].[PreProc_Header]
-WHERE Der_MostRecentFlag = 'Y')
-
-SET @StartRP = 1429 
-
-SET @RPEndDate = (SELECT ReportingPeriodEndDate
-       FROM [NHSE_Sandbox_MentalHealth].[dbo].[PreProc_Header]
-       WHERE UniqMonthID = @EndRP)
-
-
-SET @RPEndDatePerformance = (SELECT ReportingPeriodEndDate
-       FROM [NHSE_Sandbox_MentalHealth].[dbo].[PreProc_Header]
-       WHERE UniqMonthID = @LatestPerformanceSub)
-
-
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-CREATE DATA FOR PERINATAL MH DASHBOARD EXTRACT
-
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-IDENTIFY REFERRALS TO PERINATAL SERVICES
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_refs') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_refs
-
-SELECT
-	CASE 
-		WHEN r.UniqMonthID = @EndRP THEN 'Primary'
-		WHEN r.UniqMonthID = @LatestPerformanceSub THEN 'Performance'
-		ELSE 'Previous months' END AS SubmissionType, 
-	r.UniqMonthID,
-	h.Der_FY,
-	r.RecordNumber,
-	r.Person_ID,
-	r.UniqServReqID,
-	r.OrgIDProv,
-	CASE 
-		WHEN r.OrgIDCCGRes = 'X98' THEN 'Missing / Invalid'
-		ELSE COALESCE(cc.New_Code,r.OrgIDCCGRes,'Missing / Invalid') 
-		END AS OrgIDCCGRes,
-	COALESCE(c.STP_Code,'Missing / Invalid') AS STP_Code,
-	COALESCE(c.Region_Code,'Missing / Invalid') AS Region_Code,
-	r.LSOA2011,
-	d.IMD_Decile,
-	r.EthnicCategory,
-	CASE 
-		WHEN e.Category IS NULL THEN  'Missing / invalid'
-		WHEN e.Category = '' THEN 'Not known'
-		ELSE CONCAT(e.[Category],' - ',e.[Main_Description_60_Chars])
-	END AS Ethnicity,
-	r.AgeServReferRecDate,
-	r.UniqCareProfTeamID,
-	r.ServDischDate,
-	r.ReferralRequestReceivedDate,
-	r.SourceOfReferralMH,
-	r.ReferRejectionDate,
-	--CASE WHEN r.ServDischDate IS NULL OR r.ServDischDate > r.ReportingPeriodEndDate THEN 1 ELSE 0 END AS OpenReferrals, -- original logic
-	CASE WHEN (r.ServDischDate IS NULL OR r.ServDischDate > r.ReportingPeriodEndDate) AND r.ReferRejectionDate IS NULL THEN 1 ELSE 0 END AS OpenReferrals,
-	CASE WHEN r.ReferralRequestReceivedDate BETWEEN h.ReportingPeriodStartDate AND h.ReportingPeriodEndDate THEN 1 ELSE 0 END AS NewReferrals,
-	CASE WHEN r.ServDischDate BETWEEN h.ReportingPeriodStartDate AND h.ReportingPeriodEndDate THEN 1 ELSE 0 END AS ClosedReferrals,
-	h.ReportingPeriodStartDate,
-	h.ReportingPeriodEndDate
-
-INTO [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Refs
-
-FROM NHSE_Sandbox_MentalHealth.dbo.PreProc_Referral r
-
-INNER JOIN [NHSE_Sandbox_MentalHealth].[dbo].[PreProc_Header] h ON r.UniqMonthID = h.UniqMonthID
-	AND r.UniqMonthID BETWEEN @StartRP AND @EndRP 
-	AND r.Gender = '2' -- limit to Female patients only
-	AND r.ServTeamTypeRefToMH = 'C02' -- limit to referrals to Community Perinatal MH Team type [CHANGE TO: AND r.ServTeamTypeRefToMH = 'F02']
-	AND (r.LADistrictAuth IS NULL OR r.LADistrictAuth LIKE ('E%'))  -- limit to those people whose commissioner is an English organisation
-
-LEFT JOIN [NHSE_Reference].[dbo].[tbl_Ref_Other_ComCodeChanges] cc ON r.OrgIDCCGRes = cc.Org_Code
-
-LEFT JOIN NHSE_Reference.dbo.tbl_Ref_ODS_Commissioner_Hierarchies c ON COALESCE(cc.New_Code,r.OrgIDCCGRes) = c.Organisation_Code
-
-LEFT JOIN [NHSE_Reference].[dbo].[tbl_Ref_Other_Deprivation_By_LSOA] AS d ON r.LSOA2011 = d.LSOA_Code AND d.Effective_Snapshot_Date  = '2019-12-31'  
-
-LEFT JOIN [NHSE_UKHF].[Data_Dictionary].[vw_Ethnic_Category_Code_SCD] e ON r.EthnicCategory = e.[Main_Code_Text] COLLATE DATABASE_DEFAULT AND e.Is_Latest = 1
-
-
 /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 GET ATTENDED, F2F/VC CARE CONTACTS WITH PERINATAL MH SERVICES OVER THE REPORTING PERIOD 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_Conts') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Conts
 
 SELECT
 	   r.UniqMonthID,
@@ -150,9 +33,6 @@ INNER JOIN [NHSE_Sandbox_MentalHealth].dbo.PreProc_Activity c ON r.RecordNumber 
 GET CUMULATIVE ACTIVITY PER PERSON/REFERRAL - FOR CASELOAD CALCULATION 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_Cumulative') IS NOT NULL
-DROP TABLE NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_Cumulative
-
 SELECT
 	r.ReportingPeriodEndDate,
 	r.UniqMonthID,
@@ -176,9 +56,6 @@ GROUP BY r.RecordNumber, r.UniqMonthID, r.ReportingPeriodEndDate, r.UniqServReqI
 /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 IDENTIFYING FIRST ACTIVITY IN THE FINANCIAL YEAR, FOR EACH PID IN EACH ORGANISATION
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_contYTD') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_contYTD
 
 SELECT
 	   c.UniqMonthID,
@@ -205,9 +82,6 @@ WHERE c.UniqMonthID BETWEEN @StartRP AND @EndRP -- to identify a woman's first a
 /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 LINK CONTACTS TO REFERRAL - ADD IN CASELOAD DEMOGRAPHIC AND REFERRAL SOURCE FLAGS 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_Master') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Master
 
 SELECT DISTINCT
 		r.SubmissionType,
@@ -398,16 +272,9 @@ LEFT JOIN [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_ContYTD c2
 LEFT JOIN NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_Cumulative cu ON r.RecordNumber = cu.RecordNumber AND r.UniqServReqID = cu.UniqServReqID
 
 
-
-
-
-
 /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 GET DISTINCT LIST OF DATES 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_AllDates') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_AllDates
 
 SELECT DISTINCT
 	m.SubmissionType,
@@ -426,9 +293,6 @@ LEFT JOIN [NHSE_Sandbox_MentalHealth].[dbo].[PreProc_Header] AS d ON m.UniqMonth
 GET DISTINCT LIST OF PROVIDER AND COMMISSIONER COMBINATIONS
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_AllOrgs') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_AllOrgs
-
 SELECT DISTINCT
 	OrgIDProv,
 	OrgIDCCGRes,
@@ -443,9 +307,6 @@ FROM [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_master
 /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 COMBINE LIST OF DATES AND ORGS TO MAKE SURE ALL MONTHS ARE REPORTED AGAINST - PADDING FOR BASE MASTER
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_Base') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Base
 
 SELECT
 	d.SubmissionType,
@@ -465,9 +326,6 @@ FROM [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_AllDates d, [NHSE_Sandbox_
 /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ASSIGN A VALUE TO EACH MONTH IN PADDED BASE TABLE, FOR EACH PROVIDER/CCG COMBINATION
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_BaseMaster') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_BaseMaster
 
 SELECT DISTINCT
 	b.SubmissionType,
@@ -606,18 +464,11 @@ GROUP BY
 	COALESCE(p.Region_Name,'Missing / Invalid')
 
 
-
-
 /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 MONTHLY ACTIVITY EXTRACT
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
-IF OBJECT_ID ('[NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Pivot_Monthly_Extract') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Pivot_Monthly_Extract
-
-
 
 	SELECT
 		ReportingPeriodEndDate,
@@ -766,7 +617,6 @@ DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Pivot_Monthly_Extrac
 				[Caseload referred from Self referral],
 				[Caseload referred from Other referral sources],
 				[Caseload referred from Missing or Invalid sources])) U
-		
 
 
 /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -779,10 +629,6 @@ ACCESS EXTRACT
 /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 CALCULATES MONTHLY YEAR TO DATE ACCESS AT PROVIDER TO ENGLAND LEVELS
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_YTD') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_YTD
-
 
 -- Provider Year to Date access 
 SELECT DISTINCT
@@ -892,10 +738,6 @@ WHERE m.UniqMonthID BETWEEN @StartRP and @EndRP
 BRINGS THROUGH FYFV/LTP TARGETS MAPPED TO CURRENT ORGANISATIONAL BOUNDARIES
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_Targets') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Targets
-
-
 -- CCG targets mapped to latest boundaries
 SELECT DISTINCT	
 	t.FYear,
@@ -972,9 +814,6 @@ GROUP BY t.FYear, t.Organisation_Type
 DUPLICATE RECORDS ACROSS NEXT 11 MONTHS TO CALCULATE ROLIING 12 MONTH DATA - FOR CALCULATING ROLLING ACCESS PRIOR TO PUBLICATION OF NHS DIGITAL FIGURES (MARCH 2021 DATA)
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_Rolling') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Rolling
-
 
 SELECT
 	   m.UniqMonthID + (ROW_NUMBER() OVER(PARTITION BY m.UniqServReqID, m.UniqMonthID ORDER BY m.UniqMonthID ASC) -1) AS Der_MonthID,
@@ -998,9 +837,6 @@ CROSS JOIN MASTER..spt_values AS n WHERE n.type = 'p' AND n.number BETWEEN m.Uni
 GET PUBLISHED ROLLING ACCESS DATA FROM NHS DIGITAL - MARCH 2021 ONWARDS
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_Pub') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Pub
-
 SELECT
 	s.REPORTING_PERIOD_END AS ReportingPeriodEnd,
 	CASE 
@@ -1021,9 +857,6 @@ WHERE MEASURE_ID = 'MHS91'
 /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 BRINGS THROUGH ROLLING AND CALCULATED IN MONTH ACCESS TOTALS AT PROVIDER TO ENGLAND LEVELS, AND BRINGS THROUGH ONS 2016 BIRTHS FOR USE AS DENOMINATOR IN ACCESS RATE CALCULATION
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_AccessTotals') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_AccessTotals
 
 -- Provider level access, mapped to ONS E-codes for Tableau map
 SELECT DISTINCT
@@ -1637,87 +1470,3 @@ SELECT
 	Der_FY,
 	MeasureName
 
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-UNPIVOTED ACCESS EXTRACT WITH DQ FLAGS BROUGH THROUGH FOR USE IN TABLEAU MAP
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
-IF OBJECT_ID ('NHSE_Sandbox_MentalHealth.dbo.Temp_Perinatal_Pivot_Access_Extract') IS NOT NULL
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Pivot_Access_Extract
-
-
-			SELECT DISTINCT
-			GETDATE() AS ImportDate,
-			a.ReportingPeriodEndDate,
-			a.SubmissionType,
-			a.UniqMonthID,
-			a.Der_FY,
-			a.OrganisationType,
-			a.OrganisationCode,
-			a.OrganisationName,
-			a.nhser19cd_Prov,
-			prov.Region_Name,
-			a.MeasureName,
-			a.MeasureValue,
-			ISNULL(a.Denominator,0) AS Denominator,
-			a.[Geographic benchmarking group],
-			d.[YTD Missed submission flag],
-			t.Targets
-			
-			INTO [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Pivot_Access_Extract
-			
-			FROM [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Pivot_Access a
-
-			LEFT JOIN [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_ProviderDQ_Submissions_FYear d ON a.OrganisationCode = d.OrganisationCode AND a.OrganisationType = 'Provider'
-
-			LEFT JOIN NHSE_Reference.dbo.[tbl_Ref_ODS_Provider_Hierarchies] prov ON a.OrganisationCode = prov.Organisation_Code AND a.OrganisationType = 'Provider'
-
-			LEFT JOIN [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Targets t ON a.OrganisationType = t.OrganisationType AND a.OrganisationCode = t.OrganisationCode AND a.Der_FY = t.Fyear AND a.MeasureName ='YTD Access'
-
-			WHERE a.OrganisationCode != 'Missing / Invalid' AND a.OrganisationCode != 'RYK' -- Exclude DUDLEY INTEGRATED HEALTH AND CARE NHS TRUST (no longer submitting own PMH data) 
-
-
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-UPDATE ACCESS AND MONTHLY SANDBOX TABLES WITH DATA FOR THIS FINANCIAL YEAR 
-
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
--- Add to testing tables
-
-DELETE FROM NHSE_Sandbox_MentalHealth.dbo.Dashboard_Perinatal_Activity
-INSERT INTO NHSE_Sandbox_MentalHealth.dbo.Dashboard_Perinatal_Activity
-
-SELECT * 
-FROM [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Pivot_Monthly_Extract
-
-
-DELETE FROM NHSE_Sandbox_MentalHealth.dbo.Dashboard_Perinatal_Access
-INSERT INTO NHSE_Sandbox_MentalHealth.dbo.Dashboard_Perinatal_Access
-SELECT * 
-FROM [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Pivot_Access_Extract
-
-
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-DROP TEMP TABLES
-
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Pivot_Access_Extract
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Pivot_Access
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_ProviderDQ_Submissions_FYear
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_AccessTotals
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Pub
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Rolling
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Targets
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_YTD
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Pivot_Monthly_Extract
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_BaseMaster
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Base
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_AllOrgs
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_AllDates
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Master
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_contYTD
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Conts
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_refs
-DROP TABLE [NHSE_Sandbox_MentalHealth].[dbo].Temp_Perinatal_Cumulative
