@@ -1,4 +1,5 @@
--- Script for exploring aggregated count data from MHSDS
+
+-- Script for exploring aggregated count data from MHSDS for a single month
 
 SELECT
 	r.UniqMonthID,
