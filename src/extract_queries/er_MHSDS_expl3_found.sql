@@ -16,12 +16,20 @@ SELECT
     s.ServTeamTypeRefToMH,
     r.OrgIDProv,
     d.EthnicCategory,
-    d.Gender
-    
+    r.ReferralRequestReceivedDate,
+    r.SourceOfReferralMH,
+    t.ReferToTreatPeriodStartDate,
+    t.ReferToTreatPeriodEndDate,
+    o.OnwardReferDate,
+    o.OnwardReferReason,
+    o.OrgIDReceiving
+
 FROM [NHSE_MHSDS].[dbo].[MHS101Referral] r
 
 INNER JOIN [NHSE_MHSDS].[dbo].[MHSDS_SubmissionFlags] f ON r.NHSEUniqSubmissionID = f.NHSEUniqSubmissionID AND f.Der_IsLatest = 'Y'
 LEFT JOIN [NHSE_MHSDS].[dbo].[MHS501HospProvSpell] h ON r.NHSEUniqSubmissionID = h.NHSEUniqSubmissionID
 LEFT JOIN [NHSE_MHSDS].[dbo].[MHS102ServiceTypeReferredTo] s ON r.RecordNumber = s.RecordNumber AND r.UniqServReqID = s.UniqServReqID
-LEFT JOIN [NHSE_MHSDS].[dbo].[MHS001MPI] d ON r.RecordNumber = d.RecordNumber
+LEFT JOIN [NHSE_MHSDS].[dbo].[MHS001MPI] d ON r.NHSEUniqSubmissionID = d.NHSEUniqSubmissionID
+LEFT JOIN [NHSE_MHSDS].[dbo].[MHS104RTT] t ON r.NHSEUniqSubmissionID = t.NHSEUniqSubmissionID
+LEFT JOIN [NHSE_MHSDS].[dbo].[MHS105OnwardReferral] o ON r.NHSEUniqSubmissionID = o.NHSEUniqSubmissionID
 WHERE r.UniqMonthID BETWEEN 1462 AND 1464; -- Jan to Mar 2022
