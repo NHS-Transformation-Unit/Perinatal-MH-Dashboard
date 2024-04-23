@@ -3,7 +3,7 @@
 
 --- Foundation script for identifying all columns/tables we need to pull into one MHSDS dashboard data source
 
-SELECT TOP (100)
+SELECT TOP (100) -- Do I want to use DISTINCT to limit the number of Der_Persdon_ID I return?
     r.UniqMonthID, 
     r.Der_Person_ID, 
     f.ReportingPeriodStartDate,
