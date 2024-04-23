@@ -10,18 +10,18 @@ SELECT
     f.ReportingPeriodEndDate,
     r.RecordNumber, 
     r.UniqServReqID, 
+    r.ReferralRequestReceivedDate,
+    r.SourceOfReferralMH,
+    r.OrgIDProv,
     h.UniqHospProvSpellID,
     h.StartDateHospProvSpell,
     h.DischDateHospProvSpell,
     s.ServTeamTypeRefToMH,
-    r.OrgIDProv,
     d.EthnicCategory,
-    r.ReferralRequestReceivedDate,
-    r.SourceOfReferralMH,
-    t.ReferToTreatPeriodStartDate,
-    t.ReferToTreatPeriodEndDate,
+    --t.ReferToTreatPeriodStartDate, nearly all entries are NULL
+    --t.ReferToTreatPeriodEndDate, nearly all entries are NULL
     o.OnwardReferDate,
-    o.OnwardReferReason,
+    --o.OnwardReferReason, nearly all entries are NULL
     o.OrgIDReceiving
 
 FROM [NHSE_MHSDS].[dbo].[MHS101Referral] r
@@ -32,4 +32,5 @@ LEFT JOIN [NHSE_MHSDS].[dbo].[MHS102ServiceTypeReferredTo] s ON r.RecordNumber =
 LEFT JOIN [NHSE_MHSDS].[dbo].[MHS001MPI] d ON r.NHSEUniqSubmissionID = d.NHSEUniqSubmissionID
 LEFT JOIN [NHSE_MHSDS].[dbo].[MHS104RTT] t ON r.NHSEUniqSubmissionID = t.NHSEUniqSubmissionID
 LEFT JOIN [NHSE_MHSDS].[dbo].[MHS105OnwardReferral] o ON r.NHSEUniqSubmissionID = o.NHSEUniqSubmissionID
-WHERE r.UniqMonthID BETWEEN 1462 AND 1464; -- Jan to Mar 2022
+WHERE r.UniqMonthID BETWEEN 1477 AND 1488 -- Apr to May 2023/24
+AND r.OrgIDProv IN ('RV5', 'RPG', 'RQY'); -- SLaM, Oxleas and SWLaSG
