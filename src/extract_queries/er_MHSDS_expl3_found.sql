@@ -3,7 +3,7 @@
 
 --- Foundation script for identifying all columns/tables we need to pull into one MHSDS dashboard data source
 
-SELECT
+SELECT TOP (100)
     r.UniqMonthID, 
     r.Der_Person_ID, 
     f.ReportingPeriodStartDate,
