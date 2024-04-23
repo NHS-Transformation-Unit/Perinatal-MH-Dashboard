@@ -1,7 +1,7 @@
 
 -- Script for exploring aggregated count data from MHSDS across multiple months
 
---- Dropping the temporary table if ruh multiple times in one session
+--- Dropping the temporary table if run multiple times in one session
 
     DROP TABLE #HospOrder;
     
