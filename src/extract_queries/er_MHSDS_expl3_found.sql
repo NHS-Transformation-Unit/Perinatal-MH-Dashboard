@@ -22,7 +22,9 @@ SELECT TOP (100)
     rs.Main_Description,
     d.EthnicCategory,
     re.Ethnic_Category_Main_Desc,
-    d.Postcode,
+    d.DefaultPostcode,
+    d.LSOA2011,
+    d.IMDQuart,
     o.OnwardReferDate,
     o.OnwardReferReason,
     o.OrgIDReceiving
@@ -36,13 +38,11 @@ LEFT JOIN [NHSE_MHSDS].[dbo].[MHS001MPI] d ON r.RecordNumber = d.RecordNumber
 LEFT JOIN [NHSE_MHSDS].[dbo].[MHS104RTT] t ON r.RecordNumber = t.RecordNumber AND r.UniqServReqID = t.UniqServReqID
 LEFT JOIN [NHSE_MHSDS].[dbo].[MHS105OnwardReferral] o ON r.RecordNumber = o.RecordNumber AND r.UniqServReqID = o.UniqServReqID
 
-LEFT JOIN [NHSE_Reference].[dbo].[tbl_Ref_DataDic_ZZZ_EthnicCategory] re ON d.EthnicCategory = re.EthnicCategory
+LEFT JOIN [NHSE_Reference].[dbo].[tbl_Ref_DataDic_ZZZ_EthnicCategory] re ON d.EthnicCategory = re.Ethnic_Category
 LEFT JOIN [NHSE_Reference].[dbo].[tbl_Ref_DataDic_ZZZ_ServiceOrTeamTypeForMentalHealth] rs ON s.ServTeamTypeRefToMH = rs.Main_Code_Text
 LEFT JOIN [NHSE_Reference].[dbo].[tbl_Ref_ODS_ProviderSite] ro ON r.OrgIDProv = ro.ODS_Prov_OrgCode
 
 WHERE r.UniqMonthID BETWEEN 1477 AND 1488 -- Apr to May 2023/24
 AND r.OrgIDProv IN ('RV5', 'RPG', 'RQY') -- SLaM, Oxleas and SWLaSG
 AND s.ServTeamTypeRefToMH = 'C02' -- Perinatal 
-AND r.AgeServReferRecDate BETWEEN 15 AND 44
-
-ORDER BY r.Der_Person_ID DESC; 
+AND r.AgeServReferRecDate BETWEEN 15 AND 44;
