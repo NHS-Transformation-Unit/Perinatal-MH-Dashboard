@@ -6,13 +6,14 @@
 SELECT TOP (100) -- Do I want to use DISTINCT to limit the number of Der_Persdon_ID I return?
     r.UniqMonthID, 
     r.Der_Person_ID, 
-    f.ReportingPeriodStartDate,
-    f.ReportingPeriodEndDate,
+    r.AgeServReferRecDate,
     r.RecordNumber, 
     r.UniqServReqID, 
     r.ReferralRequestReceivedDate,
     r.SourceOfReferralMH,
     r.OrgIDProv,
+    f.ReportingPeriodStartDate,
+    f.ReportingPeriodEndDate,
     h.UniqHospProvSpellID,
     h.StartDateHospProvSpell,
     h.DischDateHospProvSpell,
@@ -33,5 +34,7 @@ LEFT JOIN [NHSE_MHSDS].[dbo].[MHS001MPI] d ON r.NHSEUniqSubmissionID = d.NHSEUni
 LEFT JOIN [NHSE_MHSDS].[dbo].[MHS104RTT] t ON r.NHSEUniqSubmissionID = t.NHSEUniqSubmissionID
 LEFT JOIN [NHSE_MHSDS].[dbo].[MHS105OnwardReferral] o ON r.NHSEUniqSubmissionID = o.NHSEUniqSubmissionID
 WHERE r.UniqMonthID BETWEEN 1477 AND 1488 -- Apr to May 2023/24
-AND r.OrgIDProv IN ('RV5', 'RPG', 'RQY')
-AND s.ServTeamTypeRefToMH = 'C02'; -- SLaM, Oxleas and SWLaSG
+AND r.OrgIDProv IN ('RV5', 'RPG', 'RQY') -- SLaM, Oxleas and SWLaSG
+AND s.ServTeamTypeRefToMH = 'C02' -- Perinatal 
+AND r.AgeServReferRecDate BETWEEN 15 AND 44
+AND h.DischDateHospProvSpell IS NOT NULL; 
