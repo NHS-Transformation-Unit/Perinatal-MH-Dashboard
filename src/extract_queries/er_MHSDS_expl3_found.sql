@@ -33,4 +33,5 @@ LEFT JOIN [NHSE_MHSDS].[dbo].[MHS001MPI] d ON r.NHSEUniqSubmissionID = d.NHSEUni
 LEFT JOIN [NHSE_MHSDS].[dbo].[MHS104RTT] t ON r.NHSEUniqSubmissionID = t.NHSEUniqSubmissionID
 LEFT JOIN [NHSE_MHSDS].[dbo].[MHS105OnwardReferral] o ON r.NHSEUniqSubmissionID = o.NHSEUniqSubmissionID
 WHERE r.UniqMonthID BETWEEN 1477 AND 1488 -- Apr to May 2023/24
-AND r.OrgIDProv IN ('RV5', 'RPG', 'RQY'); -- SLaM, Oxleas and SWLaSG
+AND r.OrgIDProv IN ('RV5', 'RPG', 'RQY')
+AND s.ServTeamTypeRefToMH = 'C02'; -- SLaM, Oxleas and SWLaSG
