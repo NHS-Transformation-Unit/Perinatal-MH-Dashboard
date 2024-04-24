@@ -23,10 +23,8 @@ SELECT TOP (100)
     d.EthnicCategory,
     re.Ethnic_Category_Main_Desc,
     d.Postcode,
-    --t.ReferToTreatPeriodStartDate, nearly all entries are NULL
-    --t.ReferToTreatPeriodEndDate, nearly all entries are NULL
     o.OnwardReferDate,
-    --o.OnwardReferReason, nearly all entries are NULL
+    o.OnwardReferReason,
     o.OrgIDReceiving
 
 FROM [NHSE_MHSDS].[dbo].[MHS101Referral] r
