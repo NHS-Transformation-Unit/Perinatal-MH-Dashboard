@@ -3,7 +3,7 @@
 
 --- Further development of the foundation script (`expl3`) but removing reference joins due to time taken to query
 
-SELECT DISTINCT TOP (20)
+SELECT DISTINCT TOP (1000)
 r.UniqMonthID, 
 r.Der_Person_ID, 
 r.AgeServReferRecDate,
