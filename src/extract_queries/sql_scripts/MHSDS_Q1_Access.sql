@@ -2,7 +2,7 @@
 -- Script to return data for metrics 1, 2, 3 and 4 (Perinatal MH service patient access)
 
 SELECT 
-    REF.[UniqMonthID],
+    REF.[ReferralRequestReceivedDate],
     REF_PROS.[ODS_Prov_orgName], 
     CASE WHEN CARE.[AttendOrDNACode] = '5' THEN 'Arrived on time'
          WHEN CARE.[AttendOrDNACode] = '6' THEN 'Arrived late, but was seen'
@@ -10,7 +10,7 @@ SELECT
     CASE WHEN CARE.[ConsType] = '01' THEN 'F2F'
          WHEN CARE.[ConsType] = '11' THEN 'Video'
          ELSE 'Other consultation medium' END AS [ConsDesc],
-    COUNT(DISTINCT REF.[Der_Person_ID]) AS PatientCount
+    COUNT(DISTINCT REF.[UniqServReqID]) AS PatientCount
     
 FROM [NHSE_MHSDS].[dbo].[MHS101Referral] AS REF
 
@@ -45,7 +45,7 @@ WHERE REF.[UniqMonthID] BETWEEN 1470 AND 1487
     AND CARE.[ConsType] IN ('01', '11')
 
 GROUP BY 
-    REF.[UniqMonthID],
+    REF.[ReferralRequestReceivedDate],
     REF_PROS.[ODS_Prov_orgName],
     CASE 
         WHEN CARE.[AttendOrDNACode] = '5' THEN 'Arrived on time'
