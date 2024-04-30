@@ -10,7 +10,7 @@ SELECT
     CASE WHEN CARE.[ConsType] = '01' THEN 'F2F'
          WHEN CARE.[ConsType] = '11' THEN 'Video'
          ELSE 'Other consultation medium' END AS [ConsDesc],
-    COUNT(DISTINCT REF.[UniqServReqID]) AS PatientCount
+    COUNT(DISTINCT REF.[Der_Person_ID]) AS PatientCount
     
 FROM [NHSE_MHSDS].[dbo].[MHS101Referral] AS REF
 
