@@ -29,77 +29,55 @@ Q3_closed_ref_df <- Q3_dates_df %>%
 
 ## Summarising the referral count per month for new referrals, based on the provider and ICB flags
 
-q3_new_lower_df <- Q3_new_ref_df %>%
-  filter(OrgIDProv %in% c('RV5', 'RPG', 'RQY'))
-
-Q3_new_lower_df <- q3_new_lower_df %>%
-  group_by(Month, ODS_Prov_orgName) %>%
+Q3_new_proc_df <- Q3_new_ref_df %>%
+  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
-  rename(Organisation_Flag = ODS_Prov_orgName)
-
-Q3_new_upper_df <- Q3_new_ref_df %>%
-  group_by(Month, ICB_Flag) %>%
-  summarise(Referral_Count = n(), .groups = "drop") %>%
-  rename(Organisation_Flag = ICB_Flag)
-
-q3_new_ref_proc <- rbind(Q3_new_lower_df, Q3_new_upper_df)
-
-q3_new_ref_proc <- q3_new_ref_proc %>%
+  rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "New referrals") %>%
-  select(1, 4, 2, 3)
+  select(1, 6, 2, 3, 4, 5)
 
 
 ## Summarising the referral count per month for open referrals, based on the provider and ICB flags
 
-q3_open_lower_df <- Q3_open_ref_df %>%
-  filter(OrgIDProv %in% c('RV5', 'RPG', 'RQY'))
-
-Q3_open_lower_df <- q3_open_lower_df %>%
-  group_by(Month, ODS_Prov_orgName) %>%
+Q3_open_proc_df <- Q3_open_ref_df %>%
+  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
-  rename(Organisation_Flag = ODS_Prov_orgName)
-
-Q3_open_upper_df <- Q3_open_ref_df %>%
-  group_by(Month, ICB_Flag) %>%
-  summarise(Referral_Count = n(), .groups = "drop") %>%
-  rename(Organisation_Flag = ICB_Flag)
-
-q3_open_ref_proc <- rbind(Q3_open_lower_df, Q3_open_upper_df)
-
-q3_open_ref_proc <- q3_open_ref_proc %>%
+  rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Open referrals") %>%
-  select(1, 4, 2, 3)
+  select(1, 6, 2, 3, 4, 5)
 
 
 ## Summarising the referral count per month for closed referrals, based on the provider and ICB flags
 
-q3_closed_lower_df <- Q3_closed_ref_df %>%
-  filter(OrgIDProv %in% c('RV5', 'RPG', 'RQY'))
-
-Q3_closed_lower_df <- q3_closed_lower_df %>%
-  group_by(Month, ODS_Prov_orgName) %>%
+Q3_closed_proc_df <- Q3_closed_ref_df %>%
+  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
-  rename(Organisation_Flag = ODS_Prov_orgName)
-
-Q3_closed_upper_df <- Q3_closed_ref_df %>%
-  group_by(Month, ICB_Flag) %>%
-  summarise(Referral_Count = n(), .groups = "drop") %>%
-  rename(Organisation_Flag = ICB_Flag)
-
-q3_closed_ref_proc <- rbind(Q3_open_lower_df, Q3_open_upper_df)
-
-q3_closed_ref_proc <- q3_closed_ref_proc %>%
+  rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Closed referrals") %>%
-  select(1, 4, 2, 3)
+  select(1, 6, 2, 3, 4, 5)
 
 
 ## Combining all processed dataframes into one for exporting
 
-q3_proc_combined <- rbind(q3_new_ref_proc, q3_open_ref_proc, q3_closed_ref_proc)
+q3_proc_combined <- rbind(Q3_new_proc_df, Q3_open_proc_df, Q3_closed_proc_df)
 
 q3_proc_combined <- q3_proc_combined %>%
   arrange(Month)
 
+
 ## Exporting the final new, open and closed referrals df to csv
 
 write.csv(q3_proc_combined, paste0(here(),"/data/processed_extracts/MHSDS_Q3_NOC_Referrals.csv"), row.names = FALSE)
+
+
+## Aggregating referral source for visualisation
+
+Q3_ref_Source_df <- Q3_new_ref_df %>%
+  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, SourceOfReferralMH) %>%
+  summarise(Referral_Count = n(), .groups = "drop") %>%
+  rename(Organisation_Name = ODS_Prov_orgName) %>%
+  mutate(Referral_Source = case_when(
+    x < 3 ~ "Low",
+    x >= 3 & x < 5 ~ "Medium",
+    x >= 5 ~ "High",
+    TRUE ~ "Unknown"))
