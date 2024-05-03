@@ -70,14 +70,22 @@ q3_proc_combined <- q3_proc_combined %>%
 write.csv(q3_proc_combined, paste0(here(),"/data/processed_extracts/MHSDS_Q3_NOC_Referrals.csv"), row.names = FALSE)
 
 
-## Aggregating referral source for visualisation
+## Aggregating new referral sources
 
 Q3_ref_Source_df <- Q3_new_ref_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, SourceOfReferralMH) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Referral_Source = case_when(
-    x < 3 ~ "Low",
-    x >= 3 & x < 5 ~ "Medium",
-    x >= 5 ~ "High",
-    TRUE ~ "Unknown"))
+    SourceOfReferralMH == 'A1' ~ "Referral_GP",
+    SourceOfReferralMH == 'A3' ~ "OtherPrimaryCare",
+    SourceOfReferralMH == 'A2' ~ "PrimaryCareHealthVisitor",
+    SourceOfReferralMH == 'A4' ~ "PrimaryCareMaternityService",
+    SourceOfReferralMH %in% c('P1','H2','M9','Q1') ~ "SecondaryCare",
+    SourceOfReferralMH %in% c('B1','B2') ~ "SelfReferral",
+    SourceOfReferralMH %in% c('D1','M6','I2','M7','H1','M3','N3','C1','G3','C2','E2','F3','I1','F1','E1','F2','G4','M2','M4','E3','E4','E5','G1','M1','C3','D2','E6','G2','M5') ~ "OtherReferralSource",
+    TRUE ~ "MissingInvalid")) %>%
+  select(1, 7, 2, 3, 4, 5, 6) %>%
+  arrange(Month)
+
+write.csv(Q3_ref_Source_df, paste0(here(),"/data/processed_extracts/MHSDS_Q3_Ref_Source.csv"), row.names = FALSE)
