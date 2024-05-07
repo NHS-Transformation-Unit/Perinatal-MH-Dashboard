@@ -18,6 +18,14 @@ The data to inform the agreed metrics is exported from the Mental Health Service
 
 ## Using the Repository
 
+The data for this dashboard is processed following the pipeline outlined below:
+
+<img src="images/data_pipeline.png" alt="data pipeline" width="500" align="centre"/>
+
+<br/>
+
+## Using the Repository
+
 This codebase contains:
 
 1. The SQL queries for extracting all relevant data from MHSDS.
