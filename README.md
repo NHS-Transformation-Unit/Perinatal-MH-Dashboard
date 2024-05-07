@@ -16,7 +16,7 @@ The data to inform the agreed metrics is exported from the Mental Health Service
 
 <br/>
 
-## Using the Repository
+## The MHSDS extraction pipeline
 
 The data for this dashboard is processed following the pipeline outlined below:
 
