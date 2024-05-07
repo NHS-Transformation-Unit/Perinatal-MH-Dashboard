@@ -8,7 +8,7 @@
 
 # Perinatal Mental Health Dashboard
 
-The repository contains all code used by the NHS Transformation Unit analytics team during the development of the Perinatal Mental Health Dashboard for South London and Maudsley NHS Foundation Trust.
+The repository contains all code used by the NHS Transformation Unit analytics team during the development of the Perinatal Mental Health Dashboard for South London Perinatal Provider Collaborative.
 
 The purpose of this dashboard is to collect and visualise a number of key metrics related to Perinatal Mental Health services. Specifically, the dashboard visualises data specific to three Mental Health Trusts working within the NHS South West London Integrated Care Board. 
 
