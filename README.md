@@ -20,7 +20,7 @@ The data to inform the agreed metrics is exported from the Mental Health Service
 
 The data for this dashboard is processed following the pipeline outlined below:
 
-<img src="images/data_pipeline.png" alt="data pipeline" width="500" align="centre"/>
+<img src="images/data_pipeline.png" alt="data pipeline" width="1000" align="centre"/>
 
 <br/>
 
