@@ -20,9 +20,13 @@ The data to inform the agreed metrics is exported from the Mental Health Service
 
 The data for this dashboard is processed following the pipeline outlined below:
 
+<br/>
+
 <img src="images/data_pipeline.png" alt="data pipeline" width="1000" align="centre"/>
 
 <br/>
+
+A series of SQL scripts have been developed to extract data for the constituent dashboard metrics from MHSDS. The raw data is exported using these queries as a `.csv` file, before being imported to RStudio for processing. Within RStudio, a number of preprocessing scripts are utilised to process the raw data back into `.csv` files for importing into the Excel dashboard.
 
 ## Using the Repository
 
