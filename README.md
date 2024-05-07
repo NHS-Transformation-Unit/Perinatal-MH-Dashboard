@@ -42,20 +42,26 @@ The current structure of the repository is detailed below:
 ├─── images
 └─── src
      ├─── extract_queries
-     └─── data_processing
-    
+          └─── sql_scripts
+               ├─── archived_scripts
+               └─── MHSDS_examples
+     ├─── data_processing
+          └─── r_scripts
+     └─── config
+          └─── r_scripts
+
 ```
 
 <br/>
 
 ### `documentation`
-This folder contain the project documentation.
+This folder contain the project documentation, including brief summaries of each scripts purpose and the dashboard metrics they relate to.
 
 ### `images`
 This folder contains all images used in the outputs or repository such as the TU logo.
 
 ### `src`
-All code is stored within the `src` folder. This is then divided into `extract_queries` for the SQL scripts that query NCDR and `data_processing` for R scripts employed in processing raw data.
+All code is stored within the `src` folder. This is then divided into `extract_queries` for the SQL scripts that query NCDR and `data_processing` for R scripts employed in processing raw data. A single R script is stored in the `config` subfolder which provides a list of packages needed to process any MHSDS data within R.
 
 
 <br/>
