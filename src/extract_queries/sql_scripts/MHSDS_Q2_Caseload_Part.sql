@@ -1,5 +1,5 @@
 
-## Derivative of Q2_Caseload script which uses partitions to flag a woman's first contact within the FY at the national and provider levels
+-- Derivative of Q2_Caseload script which uses partitions to flag a woman's first contact within the FY at the national and provider levels
 
 SELECT DISTINCT
 REF.[UniqMonthID],
@@ -22,22 +22,35 @@ IMD.[IMD_Decile],
 CARE.[CareContDate],
 CARE.[AttendOrDNACode],
 CARE.[ConsMechanismMH],
-
-CASE WHEN [UniqMonthID] BETWEEN 1417 AND 1428 THEN '2018/19'
-     WHEN [UniqMonthID] BETWEEN 1429 AND 1440 THEN '2019/20'
-     WHEN [UniqMonthID] BETWEEN 1441 AND 1452 THEN '2020/21'
-     WHEN [UniqMonthID] BETWEEN 1453 AND 1464 THEN '2021/22'
-     WHEN [UniqMonthID] BETWEEN 1465 AND 1476 THEN '2022/23'
-     WHEN [UniqMonthID] BETWEEN 1477 AND 1488 THEN '2023/24'
-     WHEN [UniqMonthID] BETWEEN 1489 AND 1500 THEN '2024/25'
-     WHEN [UniqMonthID] BETWEEN 1501 AND 1512 THEN '2025/26'
-     WHEN [UniqMonthID] BETWEEN 1513 AND 1524 THEN '2026/27'
-     ELSE 'Unknown FY'
-END AS [Financial_Year],
-
+CARE.[CareContactID],
      
-ROW_NUMBER () OVER(PARTITION BY REF.[Der_Person_ID], REF.[OrgIDComm], [Financial_Year] ORDER BY REF.[UniqMonthID] ASC, CARE.[CareContDate] ASC, CARE.[CareContID] ASC) AS 'FY_FA_National', -- flags a woman's first contact of financial year at CCG level
-ROW_NUMBER () OVER(PARTITION BY REF.[Der_Person_ID], REF.[OrgIDProv], [Financial_Year] ORDER BY REF.[UniqMonthID] ASC, CARE.[CareContDate] ASC, CARE.[CareContID] ASC) AS 'FY_FA_Provider', -- flags a woman's first contact of financial year at Provider level
+ROW_NUMBER () OVER(PARTITION BY REF.[Der_Person_ID], REF.[OrgIDComm], 
+                    CASE WHEN REF.[UniqMonthID] BETWEEN 1417 AND 1428 THEN '2018/19'
+                         WHEN REF.[UniqMonthID] BETWEEN 1429 AND 1440 THEN '2019/20'
+                         WHEN REF.[UniqMonthID] BETWEEN 1441 AND 1452 THEN '2020/21'
+                         WHEN REF.[UniqMonthID] BETWEEN 1453 AND 1464 THEN '2021/22'
+                         WHEN REF.[UniqMonthID] BETWEEN 1465 AND 1476 THEN '2022/23'
+                         WHEN REF.[UniqMonthID] BETWEEN 1477 AND 1488 THEN '2023/24'
+                         WHEN REF.[UniqMonthID] BETWEEN 1489 AND 1500 THEN '2024/25'
+                         WHEN REF.[UniqMonthID] BETWEEN 1501 AND 1512 THEN '2025/26'
+                         WHEN REF.[UniqMonthID] BETWEEN 1513 AND 1524 THEN '2026/27'
+                         ELSE 'Unknown FY'
+                    END
+                    ORDER BY REF.[UniqMonthID] ASC, CARE.[CareContactID] ASC) AS FY_FA_National,
+                    
+ROW_NUMBER () OVER(PARTITION BY REF.[Der_Person_ID], REF.[OrgIDProv], 
+                    CASE WHEN REF.[UniqMonthID] BETWEEN 1417 AND 1428 THEN '2018/19'
+                         WHEN REF.[UniqMonthID] BETWEEN 1429 AND 1440 THEN '2019/20'
+                         WHEN REF.[UniqMonthID] BETWEEN 1441 AND 1452 THEN '2020/21'
+                         WHEN REF.[UniqMonthID] BETWEEN 1453 AND 1464 THEN '2021/22'
+                         WHEN REF.[UniqMonthID] BETWEEN 1465 AND 1476 THEN '2022/23'
+                         WHEN REF.[UniqMonthID] BETWEEN 1477 AND 1488 THEN '2023/24'
+                         WHEN REF.[UniqMonthID] BETWEEN 1489 AND 1500 THEN '2024/25'
+                         WHEN REF.[UniqMonthID] BETWEEN 1501 AND 1512 THEN '2025/26'
+                         WHEN REF.[UniqMonthID] BETWEEN 1513 AND 1524 THEN '2026/27'
+                         ELSE 'Unknown FY'
+                    END
+                    ORDER BY REF.[UniqMonthID] ASC, CARE.[CareContactID] ASC) AS FY_FA_Provider
 
 FROM [NHSE_MHSDS].[dbo].[MHS101Referral] AS REF
 
