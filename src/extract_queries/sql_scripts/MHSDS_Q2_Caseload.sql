@@ -81,18 +81,5 @@ FROM #tmp_AW_Caseload_Order
 WHERE [Order] = 1
 AND [Count] = 1
 
-
-SELECT [UniqMonthID],
-       [ODS_Prov_orgName],
-       COUNT(*) AS [Caseload]
-FROM #tmp_AW_Caseload_Order
-WHERE [Order] = 1
-AND [Count] = 1
-
-GROUP BY [UniqMonthID],
-         [ODS_Prov_orgName]
-
-ORDER BY [ODS_Prov_orgName]
-
 DROP TABLE #tmp_AW_Caseload
 DROP TABLE #tmp_AW_Caseload_Order;
