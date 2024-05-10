@@ -3,7 +3,7 @@
 
 ## Loading Q2 data and data lookup files
 
-MHSDS_q2_file_path <- paste0(here(),"/data/raw_extracts/MHSDS_Q3_NOC_Referrals.csv") ## will need changing to actual caseload data
+MHSDS_q2_file_path <- paste0(here(),"/data/raw_extracts/MHSDS_Q2_Caseload.csv") ## will need changing to actual caseload data
 date_lookup <- paste0(here(),"/data/supporting_data/Date_Code_Lookup.csv")
 
 q2_raw_df <- read.csv(MHSDS_q2_file_path)
@@ -15,24 +15,18 @@ date_code_df <- read.csv(date_lookup)
 q2_dates_df <- left_join(q2_raw_df, date_code_df, by = c("UniqMonthID" = "Code"))
 
 
-## filtering to be only open cases (will need removing when changing to actual caseload data)
-
-q2_open_df <- q2_dates_df %>%
-  filter(OpenReferrals == 1)
-
-
 ## Filtering the raw Q2 data to isolate those living within most deprived quintile
 
-q2_dep_20 <- q2_open_df %>%
+q2_dep_20 <- q2_dates_df %>%
   filter(IMD_Decile %in% c('1','2'))
 
-q2_age_df <- q2_open_df %>%
-  mutate(AgeRepPeriodEnd = as.numeric(AgeRepPeriodEnd))
+q2_age_df <- q2_dates_df %>%
+  mutate(AgeServReferRecDate = as.numeric(AgeServReferRecDate))
 
 
 ## Summarising the caseload each month based on the ethnic group of referred patients
 
-q2_eth_total_df <- q2_open_df %>%
+q2_eth_total_df <- q2_dates_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
@@ -40,7 +34,7 @@ q2_eth_total_df <- q2_open_df %>%
          Ethnicity = "All") %>%
   select(1, 6, 7, 2, 3, 4, 5)
 
-q2_eth_spec_df <- q2_open_df %>%
+q2_eth_spec_df <- q2_dates_df %>%
   mutate(Ethnicity = case_when(
     Ethnic_Category_Main_Desc %in% c('British','Irish') ~ "WhiteBritishIrish",
     Ethnic_Category_Main_Desc == 'Any other white background' ~ "OtherWhite",
@@ -67,7 +61,7 @@ write.csv(q2_eth_combined, paste0(here(),"/data/processed_extracts/MHSDS_Q2_Eth_
 
 ## Summarising the caseload each month based on the deprivation decile of referred patients
 
-q2_dep_total_df <- q2_open_df %>%
+q2_dep_total_df <- q2_dates_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
@@ -93,7 +87,7 @@ write.csv(q2_dep_combined, paste0(here(),"/data/processed_extracts/MHSDS_Q2_Dep_
 
 ## Summarising the caseload each month based on the age group of referred patients
 
-q2_age_total_df <- q2_open_df %>%
+q2_age_total_df <- q2_dates_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
@@ -103,10 +97,10 @@ q2_age_total_df <- q2_open_df %>%
 
 q2_age_spec_df <- q2_age_df %>%
   mutate(Age_Band = case_when(
-    AgeRepPeriodEnd >= 16 & AgeRepPeriodEnd < 21 ~ "16-20",
-    AgeRepPeriodEnd >= 21 & AgeRepPeriodEnd < 26 ~ "21-25",
-    AgeRepPeriodEnd >= 26 & AgeRepPeriodEnd < 40 ~ "26-39",
-    AgeRepPeriodEnd >= 40 ~ "40+",
+    AgeServReferRecDate >= 16 & AgeServReferRecDate < 21 ~ "16-20",
+    AgeServReferRecDate >= 21 & AgeServReferRecDate < 26 ~ "21-25",
+    AgeServReferRecDate >= 26 & AgeServReferRecDate < 40 ~ "26-39",
+    AgeServReferRecDate >= 40 ~ "40+",
     TRUE ~ "NotKnown")) %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Age_Band) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
