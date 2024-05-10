@@ -1,4 +1,6 @@
 
+-- Script to return perinatal caseload for all English providers between April 2019 and Feb 2024
+
 SELECT DISTINCT
 REF.[UniqMonthID],
 SF.[ReportingPeriodStartDate],
@@ -19,8 +21,10 @@ MPI.[LSOA2011],
 IMD.[IMD_Decile],
 CARE.[CareContDate],
 CARE.[AttendOrDNACode],
-CARE.[ConsMechanismMH]
+CARE.[ConsMechanismMH],
+CASE WHEN CARE.[CareContDate] > SF.[ReportingPeriodEndDate] THEN 0 ELSE 1 END AS [Count]
 
+INTO #tmp_AW_Caseload
 FROM [NHSE_MHSDS].[dbo].[MHS101Referral] AS REF
 
 INNER JOIN [NHSE_MHSDS].[dbo].[MHSDS_SubmissionFlags] AS SF
@@ -55,10 +59,40 @@ LEFT JOIN [NHSE_MHSDS].[dbo].[MHS102ServiceTypeReferredTo] AS DISC
 ON REF.[RecordNumber] = DISC.[RecordNumber] 
 AND REF.[UniqServReqID] = DISC.[UniqServReqID]
 
-WHERE REF.[UniqMonthID] BETWEEN 1485 AND 1487 
+WHERE REF.[UniqMonthID] BETWEEN 1429 AND 1487
 AND SERV.[ServTeamTypeRefToMH] = 'C02'
 AND REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY')
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2'
 AND (REF.[ServDischDate] IS NULL OR REF.[ServDischDate] > SF.[ReportingPeriodEndDate])
 AND DISC.[ReferRejectionDate] IS NULL
+AND CARE.[ConsMechanismMH] IN ('01', '11')
+AND CARE.[AttendOrDNACode] IN ('5', '6')
+AND CARE.[CareContDate] IS NOT NULL
+
+
+SELECT *,
+ROW_NUMBER() OVER(PARTITION BY [UniqServReqID], [UniqMonthID] ORDER BY [CareContDate]) AS [Order]
+INTO #tmp_AW_Caseload_Order
+FROM #tmp_AW_Caseload
+
+SELECT *
+FROM #tmp_AW_Caseload_Order
+WHERE [Order] = 1
+AND [Count] = 1
+
+
+SELECT [UniqMonthID],
+       [ODS_Prov_orgName],
+       COUNT(*) AS [Caseload]
+FROM #tmp_AW_Caseload_Order
+WHERE [Order] = 1
+AND [Count] = 1
+
+GROUP BY [UniqMonthID],
+         [ODS_Prov_orgName]
+
+ORDER BY [ODS_Prov_orgName]
+
+DROP TABLE #tmp_AW_Caseload
+DROP TABLE #tmp_AW_Caseload_Order;
