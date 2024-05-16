@@ -75,6 +75,7 @@ AND REF.[UniqServReqID] = DISC.[UniqServReqID]
 
 WHERE REF.[UniqMonthID] BETWEEN 1429 AND @EndRP
 AND SERV.[ServTeamTypeRefToMH] = 'C02'
+AND REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY')
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2'
 AND (REF.[ServDischDate] IS NULL OR REF.[ServDischDate] > SF.[ReportingPeriodEndDate])

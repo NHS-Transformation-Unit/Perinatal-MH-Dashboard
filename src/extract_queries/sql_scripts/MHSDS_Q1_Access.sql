@@ -91,7 +91,7 @@ AND CARE.[CareContDate] IS NOT NULL
 
 
 SELECT *,
-ROW_NUMBER() OVER(PARTITION BY [UniqServReqID], [UniqMonthID] ORDER BY [CareContDate]) AS [Order]
+ROW_NUMBER() OVER(PARTITION BY [UniqServReqID], [UniqMonthID], [OrgIDProv] ORDER BY [CareContDate]) AS [Order]
 INTO #tmp_ER_Access_Order
 FROM #tmp_ER_Access
 
