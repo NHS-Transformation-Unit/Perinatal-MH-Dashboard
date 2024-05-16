@@ -1,6 +1,11 @@
 
 -- Script to return new, open and closed referrals for all English providers between April 2019 and Feb 2024
 
+DECLARE @EndRP INT;
+
+SELECT @EndRP = MAX(UniqMonthID)
+FROM [NHSE_MHSDS].[dbo].[MHS101Referral];
+
 SELECT DISTINCT
 
     SF.[ReportingPeriodStartDate],
@@ -108,7 +113,7 @@ LEFT JOIN [NHSE_Reference].[dbo].[tbl_Ref_Other_Deprivation_By_LSOA] as [IMD]
 ON MPI.[LSOA2011] = IMD.[LSOA_Code]
 AND IMD.[Effective_Snapshot_Date] = '2019-12-31'
 
-WHERE REF.[UniqMonthID] BETWEEN 1429 AND 1487
+WHERE REF.[UniqMonthID] BETWEEN 1429 AND @EndRP
 AND SERV.[ServTeamTypeRefToMH] = 'C02'
 AND REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY')
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))

@@ -1,12 +1,10 @@
 
 -- days to first contact. Takes the new referrals each month and then calculates the days to their first appointment
 
-DECLARE @EndRP INT
+DECLARE @EndRP INT;
 
-SET @EndRP =
-(SELECT UniqMonthID
-FROM 
-MAX UNIQ MonthID)
+SELECT @EndRP = MAX(UniqMonthID)
+FROM [NHSE_MHSDS].[dbo].[MHS101Referral];
 
 SELECT DISTINCT
 
@@ -110,7 +108,7 @@ LEFT JOIN [NHSE_MHSDS].[dbo].[MHS201CareContact] AS CARE
 ON REF.[Der_Person_ID] = CARE.[Der_Person_ID] 
 AND REF.[UniqServReqID] = CARE.[UniqServReqID]
 
-WHERE REF.[UniqMonthID] BETWEEN 1429 AND 1487
+WHERE REF.[UniqMonthID] BETWEEN 1429 AND @EndRP
 AND SERV.[ServTeamTypeRefToMH] = 'C02'
 AND REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY')
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
