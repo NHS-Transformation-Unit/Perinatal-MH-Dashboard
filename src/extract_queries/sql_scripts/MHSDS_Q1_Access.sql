@@ -6,11 +6,11 @@ DECLARE @EndRP INT;
 SET @EndRP = (SELECT MAX(UniqMonthID)
               FROM [NHSE_MHSDS].[dbo].[MHS101Referral]);
 
---DECLARE @StartRP INT;
+DECLARE @StartRP INT;
 
---SET @StartRP = (SELECT MAX(UniqMonthID)
-                --FROM [NHSE_MHSDS].[dbo].[MHS101Referral]
-                --WHERE UniqMonthID <= DATEADD(MONTH, -24, @EndRP));
+SET @StartRP = (SELECT MAX(UniqMonthID)
+                FROM [NHSE_MHSDS].[dbo].[MHS101Referral]
+                WHERE UniqMonthID <= DATEADD(MONTH, -12, @EndRP));
 
 SELECT DISTINCT
 REF.[UniqMonthID],
@@ -33,18 +33,9 @@ IMD.[IMD_Decile],
 CARE.[CareContDate],
 CARE.[AttendOrDNACode],
 CARE.[ConsMechanismMH],
+CASE WHEN CARE.[CareContDate] > SF.[ReportingPeriodEndDate] THEN 0 ELSE 1 END AS [Count]
 
-CASE WHEN CARE.[CareContDate] > SF.[ReportingPeriodEndDate] THEN 0 
-     ELSE 1 END AS [Count],
-
-CASE WHEN REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') THEN 'Providers'
-		 ELSE 'Other' END AS [Provider_Flag],
-		      
-CASE WHEN REF.[OrgIDProv] IN ('RRU', 'RPG', 'RJZ', 'RJ1', 'RV5', 'RJ2') THEN 'NHS South East London ICB'
-		 WHEN REF.[OrgIDProv] IN ('RJ7', 'RAX', 'RQY', 'RY9', 'RJ6', 'RVR') THEN 'NHS South West London ICB'
-		 ELSE 'Other' END AS [ICB_Flag]
-
-INTO #tmp_ER_Access
+INTO #tmpAllContacts
 FROM [NHSE_MHSDS].[dbo].[MHS101Referral] AS REF
 
 INNER JOIN [NHSE_MHSDS].[dbo].[MHSDS_SubmissionFlags] AS SF
@@ -79,26 +70,17 @@ LEFT JOIN [NHSE_MHSDS].[dbo].[MHS102ServiceTypeReferredTo] AS DISC
 ON REF.[RecordNumber] = DISC.[RecordNumber] 
 AND REF.[UniqServReqID] = DISC.[UniqServReqID]
 
-WHERE REF.[UniqMonthID] BETWEEN 1429 AND @EndRP
+WHERE REF.[UniqMonthID] BETWEEN @StartRP AND @EndRP
 AND SERV.[ServTeamTypeRefToMH] = 'C02'
 AND REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY')
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2'
-AND DISC.[ReferRejectionDate] IS NULL
 AND CARE.[ConsMechanismMH] IN ('01', '11')
 AND CARE.[AttendOrDNACode] IN ('5', '6')
-AND CARE.[CareContDate] IS NOT NULL
+AND CARE.[CareContDate] >= '2023-04-01'
 
 
-SELECT *,
-ROW_NUMBER() OVER(PARTITION BY [UniqServReqID], [UniqMonthID], [OrgIDProv] ORDER BY [CareContDate]) AS [Order]
-INTO #tmp_ER_Access_Order
-FROM #tmp_ER_Access
+SELECT [OrgIDProv],[ODS_Prov_orgName], COUNT(DISTINCT Der_Person_ID) FROM #tmpAllContacts
+GROUP BY [OrgIDProv],[ODS_Prov_orgName]
 
-SELECT *
-FROM #tmp_ER_Access_Order
-WHERE [Order] = 1
-AND [Count] = 1
-
-DROP TABLE #tmp_ER_Access
-DROP TABLE #tmp_ER_Access_Order;
+DROP TABLE #tmpAllContacts;
