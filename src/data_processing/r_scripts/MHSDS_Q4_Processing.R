@@ -1,30 +1,18 @@
 
-# Script for prcessing all new, open and closed referrals to perinatal MH services across English providers from April 2019 until February 2024
+# Script for prcessing referral to first contact time for perinatal MH services across English providers from April 2019 until February 2024
 
-## Loading Q3 data and data lookup files
+## Loading Q4 data and data lookup files
 
-MHSDS_q3_file_path <- paste0(here(),"/data/raw_extracts/MHSDS_Q3_NOC_Referrals.csv")
+MHSDS_q4_file_path <- paste0(here(),"/data/raw_extracts/MHSDS_Q4_RTFc.csv")
 date_lookup <- paste0(here(),"/data/supporting_data/Date_Code_Lookup.csv")
 
-q3_raw_df <- read.csv(MHSDS_q3_file_path)
+q4_raw_df <- read.csv(MHSDS_q4_file_path)
 date_code_df <- read.csv(date_lookup)
 
 
-## Joining lookup file to raw Q3 data
+## Joining lookup file to raw Q4 data
 
-q3_dates_df <- left_join(q3_raw_df, date_code_df, by = c("UniqMonthID" = "Code"))
-
-
-## Filtering the raw Q3 data into new, open and closed referral groups
-
-q3_new_ref_df <- q3_dates_df %>%
-  filter(NewReferrals == 1)
-
-q3_open_ref_df <- q3_dates_df %>%
-  filter(OpenReferrals == 1 & NewReferrals == 0)
-
-q3_closed_ref_df <- q3_dates_df %>%
-  filter(ClosedReferrals == 1)
+q4_dates_df <- left_join(q4_raw_df, date_code_df, by = c("UniqMonthID" = "Code"))
 
 
 ## Summarising the referral count per month for new referrals, based on the provider and ICB flags
