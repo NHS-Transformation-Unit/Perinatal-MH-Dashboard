@@ -24,3 +24,8 @@ q4_RTFc_Summary <- q4_dates_df %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Referral to First Contact") %>%
   select(Month, Metric, Provider_Flag, ICB_Flag, Organisation_Name, Average_RTFc)
+
+q4_RTFc_Summary <- q4_RTFc_Summary %>%
+  arrange(Month, Organisation_Name)
+
+write.csv(q4_RTFc_Summary, paste0(here(),"/data/processed_extracts/MHSDS_Q4_RTFc.csv"), row.names = FALSE)
