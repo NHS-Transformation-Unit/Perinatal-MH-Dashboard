@@ -6,11 +6,11 @@ DECLARE @EndRP INT;
 SET @EndRP = (SELECT MAX(UniqMonthID)
               FROM [NHSE_MHSDS].[dbo].[MHS101Referral]);
 
-DECLARE @StartRP INT;
+--DECLARE @StartRP INT;
 
-SET @StartRP = (SELECT MAX(UniqMonthID)
-                FROM [NHSE_MHSDS].[dbo].[MHS101Referral]
-                WHERE UniqMonthID <= DATEADD(MONTH, -24, @EndRP));
+--SET @StartRP = (SELECT MAX(UniqMonthID)
+                --FROM [NHSE_MHSDS].[dbo].[MHS101Referral]
+                --WHERE UniqMonthID <= DATEADD(MONTH, -24, @EndRP));
 
 SELECT DISTINCT
 REF.[UniqMonthID],
@@ -79,7 +79,7 @@ LEFT JOIN [NHSE_MHSDS].[dbo].[MHS102ServiceTypeReferredTo] AS DISC
 ON REF.[RecordNumber] = DISC.[RecordNumber] 
 AND REF.[UniqServReqID] = DISC.[UniqServReqID]
 
-WHERE REF.[UniqMonthID] BETWEEN @StartRP AND @EndRP
+WHERE REF.[UniqMonthID] BETWEEN 1429 AND @EndRP
 AND SERV.[ServTeamTypeRefToMH] = 'C02'
 AND REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY')
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
