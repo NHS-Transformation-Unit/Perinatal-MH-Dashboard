@@ -10,9 +10,15 @@ q3_raw_df <- read.csv(MHSDS_q3_file_path)
 date_code_df <- read.csv(date_lookup)
 
 
+## Filtering out of area patients
+
+q3_area_df <- q3_raw_df %>%
+  filter(SL_PRO_FLAG = 1)
+
+
 ## Joining lookup file to raw Q3 data
 
-q3_dates_df <- left_join(q3_raw_df, date_code_df, by = c("UniqMonthID" = "Code"))
+q3_dates_df <- left_join(q3_area_df, date_code_df, by = c("UniqMonthID" = "Code"))
 
 
 ## Filtering the raw Q3 data into new, open and closed referral groups

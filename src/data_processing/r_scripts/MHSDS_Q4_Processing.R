@@ -11,9 +11,15 @@ q4_raw_df <- read.csv(MHSDS_q4_file_path)
 date_code_df <- read.csv(date_lookup)
 
 
+## Filtering out of area patients
+
+q4_area_df <- q4_raw_df %>%
+  filter(SL_PRO_FLAG = 1)
+
+
 ## Joining lookup file to raw Q4 data
 
-q4_dates_df <- left_join(q4_raw_df, date_code_df, by = c("UniqMonthID" = "Code"))
+q4_dates_df <- left_join(q4_area_df, date_code_df, by = c("UniqMonthID" = "Code"))
 
 
 ## Summarising the referral count per month for new referrals, based on the provider and ICB flags
