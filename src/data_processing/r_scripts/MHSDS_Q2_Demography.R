@@ -10,9 +10,15 @@ q2_raw_df <- read.csv(MHSDS_q2_file_path)
 date_code_df <- read.csv(date_lookup)
 
 
+## Filtering out of area patients
+
+q2_area_df <- q2_raw_df %>%
+  filter(SL_PRO_FLAG = 1)
+
+
 ## Joining lookup file to raw Q3 data
 
-q2_dates_df <- left_join(q2_raw_df, date_code_df, by = c("UniqMonthID" = "Code"))
+q2_dates_df <- left_join(q2_area_df, date_code_df, by = c("UniqMonthID" = "Code"))
 
 
 ## Filtering the raw Q2 data to isolate those living within most deprived quintile
