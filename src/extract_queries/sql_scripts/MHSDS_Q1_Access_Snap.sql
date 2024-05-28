@@ -79,6 +79,9 @@ LEFT JOIN [NHSE_MHSDS].[dbo].[MHS102ServiceTypeReferredTo] AS DISC
 ON REF.[RecordNumber] = DISC.[RecordNumber] 
 AND REF.[UniqServReqID] = DISC.[UniqServReqID]
 
+LEFT JOIN [NHSE_Reference].[dbo].[tbl_Ref_ODS_Commissioner_Hierarchies] AS COMM
+ON REF.[OrgIDComm] = COMM.[Organisation_Code]
+
 WHERE REF.[UniqMonthID] = @EndRP
 AND SERV.[ServTeamTypeRefToMH] = 'C02'
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))

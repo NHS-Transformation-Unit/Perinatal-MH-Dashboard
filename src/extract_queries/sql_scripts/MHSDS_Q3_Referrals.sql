@@ -124,8 +124,11 @@ LEFT JOIN [NHSE_Reference].[dbo].[tbl_Ref_Other_Deprivation_By_LSOA] as [IMD]
 ON MPI.[LSOA2011] = IMD.[LSOA_Code]
 AND IMD.[Effective_Snapshot_Date] = '2019-12-31'
 
-WHERE REF.[UniqMonthID] BETWEEN 1429 AND @EndRP
+LEFT JOIN [NHSE_Reference].[dbo].[tbl_Ref_ODS_Commissioner_Hierarchies] AS COMM
+ON REF.[OrgIDComm] = COMM.[Organisation_Code]
+
+WHERE REF.[UniqMonthID] BETWEEN @StartRP AND @EndRP
 AND SERV.[ServTeamTypeRefToMH] = 'C02'
-AND REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY')
+AND (REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') OR COMM.[STP_Code] IN ('QWE', 'QKK'))
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2';

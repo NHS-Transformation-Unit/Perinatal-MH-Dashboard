@@ -126,9 +126,12 @@ LEFT JOIN [NHSE_MHSDS].[dbo].[MHS201CareContact] AS CARE
 ON REF.[Der_Person_ID] = CARE.[Der_Person_ID] 
 AND REF.[UniqServReqID] = CARE.[UniqServReqID]
 
-WHERE REF.[UniqMonthID] BETWEEN 1429 AND @EndRP
+LEFT JOIN [NHSE_Reference].[dbo].[tbl_Ref_ODS_Commissioner_Hierarchies] AS COMM
+ON REF.[OrgIDComm] = COMM.[Organisation_Code]
+
+WHERE REF.[UniqMonthID] BETWEEN @StartRP AND @EndRP
 AND SERV.[ServTeamTypeRefToMH] = 'C02'
-AND REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY')
+AND (REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') OR COMM.[STP_Code] IN ('QWE', 'QKK'))
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2'
 AND REF.[ReferralRequestReceivedDate] BETWEEN SF.[ReportingPeriodStartDate] AND SF.[ReportingPeriodEndDate]
