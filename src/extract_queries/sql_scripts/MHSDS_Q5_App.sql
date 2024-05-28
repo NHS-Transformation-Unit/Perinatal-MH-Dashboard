@@ -52,21 +52,14 @@ SELECT DISTINCT
     CARE.[ConsMechanismMH],
     CARE.[AttendOrDNACode],
     ATT_STAT.[Main_Description] as [Attendance_Status],
-    --CASE WHEN CARE.[ConsMechanismMH] = '01' THEN 'Face to Face'
-    --   WHEN CARE.[ConsMechanismMH] = '02' THEN 'Telephone'
-    --   WHEN CARE.[ConsMechanismMH] = '03' THEN 'Telemedicine'
-    --   WHEN CARE.[ConsMechanismMH] = '04' THEN 'Talk type for a person unable to speak'
-    --   WHEN CARE.[ConsMechanismMH] = '05' THEN 'Email'
-    --   WHEN CARE.[ConsMechanismMH] = '06' THEN 'Short message service (SMS) - text messaging'
-    --   WHEN CARE.[ConsMechanismMH] = '07' THEN 'On-line Triage'
-    --   WHEN CARE.[ConsMechanismMH] = '08' THEN 'Online Instant Messaging'
-    --   WHEN CARE.[ConsMechanismMH] = '09' THEN 'Text message (Asynchronous)'
-    --   WHEN CARE.[ConsMechanismMH] = '10' THEN 'Instant messaging (Synchronous)'
-    --   WHEN CARE.[ConsMechanismMH] = '11' THEN 'Video Consultation'
-    --   WHEN CARE.[ConsMechanismMH] = '12' THEN 'Message Board (Asynchronous)'
-    --   WHEN CARE.[ConsMechanismMH] = '13' THEN 'Chat Room (Synchronous)'
-    --   WHEN CARE.[ConsMechanismMH] = '98' THEN 'Other'
-    --   ELSE 'Unknown' END AS [Consultation_Medium],
+    
+    CASE WHEN REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') THEN 'Providers'
+		ELSE 'Other' END AS [Provider_Flag],
+		
+	  CASE WHEN REF.[OrgIDProv] IN ('RRU', 'RPG', 'RJZ', 'RJ1', 'RV5', 'RJ2') THEN 'NHS South East London ICB'
+		WHEN REF.[OrgIDProv] IN ('RJ7', 'RAX', 'RQY', 'RY9', 'RJ6', 'RVR') THEN 'NHS South West London ICB'
+		ELSE 'Other' END AS [ICB_Flag],
+    
     COMM.[Organisation_Code],
     COMM.[Organisation_Name],
     COMM.[STP_Name],
