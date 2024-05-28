@@ -10,43 +10,45 @@ SET @EndRP = (SELECT MAX(UniqMonthID)
 SET @StartRP = (@EndRP - 36)
 
 SELECT DISTINCT
-REF.[UniqMonthID],
-SF.[ReportingPeriodStartDate],
-SF.[ReportingPeriodEndDate],
-REF.[Der_Person_ID], 
-REF.[AgeServReferRecDate],
-REF.[RecordNumber], 
-REF.[UniqServReqID], 
-REF.[ReferralRequestReceivedDate],
-REF.[SourceOfReferralMH],
-REF.[OrgIDProv],
-REF_PROS.[ODS_Prov_orgName], 
-SERV.[ServTeamTypeRefToMH],
-STYPE.[Main_Description],
-MPI.[EthnicCategory],
-ETH.[Ethnic_Category_Main_Desc],
-MPI.[LSOA2011],
-IMD.[IMD_Decile],
-CARE.[CareContDate],
-CARE.[AttendOrDNACode],
-CARE.[ConsMechanismMH],
 
-CASE WHEN CARE.[CareContDate] > SF.[ReportingPeriodEndDate] THEN 0 
-     ELSE 1 END AS [Count],
+    REF.[UniqMonthID],
+    SF.[ReportingPeriodStartDate],
+    SF.[ReportingPeriodEndDate],
+    REF.[Der_Person_ID], 
+    REF.[AgeServReferRecDate],
+    REF.[RecordNumber], 
+    REF.[UniqServReqID], 
+    REF.[ReferralRequestReceivedDate],
+    REF.[SourceOfReferralMH],
+    REF.[OrgIDProv],
+    REF_PROS.[ODS_Prov_orgName], 
+    SERV.[ServTeamTypeRefToMH],
+    STYPE.[Main_Description],
+    MPI.[EthnicCategory],
+    ETH.[Ethnic_Category_Main_Desc],
+    MPI.[LSOA2011],
+    IMD.[IMD_Decile],
+    CARE.[CareContDate],
+    CARE.[AttendOrDNACode],
+    CARE.[ConsMechanismMH],
 
-CASE WHEN REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') THEN 'Providers'
-		 ELSE 'Other' END AS [Provider_Flag],
+    CASE WHEN CARE.[CareContDate] > SF.[ReportingPeriodEndDate] THEN 0 
+         ELSE 1 END AS [Count],
+
+    CASE WHEN REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') THEN 'Providers'
+         ELSE 'Other' END AS [Provider_Flag],
 		      
-CASE WHEN REF.[OrgIDProv] IN ('RRU', 'RPG', 'RJZ', 'RJ1', 'RV5', 'RJ2') THEN 'NHS South East London ICB'
-		 WHEN REF.[OrgIDProv] IN ('RJ7', 'RAX', 'RQY', 'RY9', 'RJ6', 'RVR') THEN 'NHS South West London ICB'
-		 ELSE 'Other' END AS [ICB_Flag],
+    CASE WHEN REF.[OrgIDProv] IN ('RRU', 'RPG', 'RJZ', 'RJ1', 'RV5', 'RJ2') THEN 'NHS South East London ICB'
+         WHEN REF.[OrgIDProv] IN ('RJ7', 'RAX', 'RQY', 'RY9', 'RJ6', 'RVR') THEN 'NHS South West London ICB'
+         ELSE 'Other' END AS [ICB_Flag],
 		 
-COMM.[Organisation_Code],
-COMM.[Organisation_Name],
-COMM.[STP_Name],
-COMM.[STP_Code],
-CASE WHEN COMM.[STP_Code] IN ('QWE', 'QKK') THEN 1 ELSE 0 END AS [SL_ICB_FLAG],
-CASE WHEN REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') THEN 1 ELSE 0 END AS [SL_PRO_FLAG]
+    COMM.[Organisation_Code],
+    COMM.[Organisation_Name],
+    COMM.[STP_Name],
+    COMM.[STP_Code],
+    
+    CASE WHEN COMM.[STP_Code] IN ('QWE', 'QKK') THEN 1 ELSE 0 END AS [SL_ICB_FLAG],
+    CASE WHEN REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') THEN 1 ELSE 0 END AS [SL_PRO_FLAG]
 
 INTO #tmp_AW_Caseload
 FROM [NHSE_MHSDS].[dbo].[MHS101Referral] AS REF
