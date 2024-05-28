@@ -87,7 +87,6 @@ AND CARE.[ConsMechanismMH] IN ('01', '11')
 AND CARE.[AttendOrDNACode] IN ('5', '6')
 AND CARE.[CareContDate] IS NOT NULL
 
-
 SELECT *,
 ROW_NUMBER() OVER(PARTITION BY [UniqServReqID], [UniqMonthID] ORDER BY [CareContDate]) AS [Order]
 INTO #tmp_AW_Caseload_Order

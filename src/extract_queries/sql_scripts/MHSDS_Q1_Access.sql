@@ -76,7 +76,6 @@ AND CARE.[ConsMechanismMH] IN ('01', '11')
 AND CARE.[AttendOrDNACode] IN ('5', '6')
 AND CARE.[CareContDate] >= '2023-04-01'
 
-
 SELECT [OrgIDProv],[ODS_Prov_orgName], COUNT(DISTINCT Der_Person_ID) FROM #tmpAllContacts
 GROUP BY [OrgIDProv],[ODS_Prov_orgName]
 
