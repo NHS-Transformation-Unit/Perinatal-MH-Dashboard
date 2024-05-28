@@ -39,7 +39,7 @@ SELECT DISTINCT
 		      
     CASE WHEN REF.[OrgIDProv] IN ('RRU', 'RPG', 'RJZ', 'RJ1', 'RV5', 'RJ2') THEN 'NHS South East London ICB'
          WHEN REF.[OrgIDProv] IN ('RJ7', 'RAX', 'RQY', 'RY9', 'RJ6', 'RVR') THEN 'NHS South West London ICB'
-         ELSE 'Other' END AS [ICB_Flag]
+         ELSE 'Other' END AS [ICB_Flag],
 
     COMM.[Organisation_Code],
     COMM.[Organisation_Name],
