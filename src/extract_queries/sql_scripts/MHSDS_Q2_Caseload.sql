@@ -1,15 +1,13 @@
 
--- Script to return perinatal caseload for all English providers between April 2019 and Feb 2024
+-- Script to return perinatal caseload for all English providers during the previous 36-months
 
 DECLARE @EndRP INT;
 DECLARE @StartRP INT;
-
+ 
 SET @EndRP = (SELECT MAX(UniqMonthID)
-              FROM [NHSE_MHSDS].[dbo].[MHS101Referral]);
-
-SET @StartRP = (SELECT MAX(UniqMonthID)
-                FROM [NHSE_MHSDS].[dbo].[MHS101Referral]
-                WHERE UniqMonthID <= DATEADD(MONTH, -24, @EndRP));
+              FROM [NHSE_MHSDS].[dbo].[MHS101Referral])
+ 
+SET @StartRP = (@EndRP - 36)
 
 SELECT DISTINCT
 REF.[UniqMonthID],

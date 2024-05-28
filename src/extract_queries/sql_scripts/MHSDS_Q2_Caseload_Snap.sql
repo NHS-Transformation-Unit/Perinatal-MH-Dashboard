@@ -1,5 +1,5 @@
 
--- Script to return perinatal caseload for all English providers between April 2019 and Feb 2024
+-- Script to return perinatal caseload for all English providers during the previous 12-months
 
 DECLARE @EndRP INT;
 

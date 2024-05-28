@@ -1,16 +1,13 @@
 
--- Script to return perinatal access for all English providers during the previous 12-months
+-- Script to return perinatal access for all English providers during the previous 36-months
 
 DECLARE @EndRP INT;
-
-SET @EndRP = (SELECT MAX(UniqMonthID)
-              FROM [NHSE_MHSDS].[dbo].[MHS101Referral]);
-
 DECLARE @StartRP INT;
-
-SET @StartRP = (SELECT MAX(UniqMonthID)
-                FROM [NHSE_MHSDS].[dbo].[MHS101Referral]
-                WHERE UniqMonthID <= DATEADD(MONTH, -12, @EndRP));
+ 
+SET @EndRP = (SELECT MAX(UniqMonthID)
+              FROM [NHSE_MHSDS].[dbo].[MHS101Referral])
+ 
+SET @StartRP = (@EndRP - 36)
 
 SELECT DISTINCT
 REF.[UniqMonthID],

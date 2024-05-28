@@ -1,10 +1,13 @@
 
--- days to first contact. Takes the new referrals each month and then calculates the days to their first appointment
+-- Script to return first contact. Takes the new referrals each month and then calculates the days to their first appointment during the previous 36-months
 
 DECLARE @EndRP INT;
-
-SELECT @EndRP = MAX(UniqMonthID)
-FROM [NHSE_MHSDS].[dbo].[MHS101Referral];
+DECLARE @StartRP INT;
+ 
+SET @EndRP = (SELECT MAX(UniqMonthID)
+              FROM [NHSE_MHSDS].[dbo].[MHS101Referral])
+ 
+SET @StartRP = (@EndRP - 36)
 
 SELECT DISTINCT
 
