@@ -1,5 +1,5 @@
 
--- Script to return first contact. Takes the new referrals each month and then calculates the days to their first appointment during the previous 36-months
+-- Script to return first contact (isolates new referrals each month and then calculates the days to their first appointment) during the previous 36-months
 
 DECLARE @EndRP INT;
 DECLARE @StartRP INT;
