@@ -3,45 +3,77 @@
 
 ## Loading Q2 data and data lookup files
 
-MHSDS_q2_file_path <- paste0(here(),"/data/raw_extracts/MHSDS_Q2_Caseload.csv") ## will need changing to actual caseload data
+MHSDS_q2_main_file_path <- paste0(here(),"/data/raw_extracts/MHSDS_Q2_Main_Caseload.csv")
+MHSDS_q2_snap_file_path <- paste0(here(),"/data/raw_extracts/MHSDS_Q2_Snap_Access.csv")
 date_lookup <- paste0(here(),"/data/supporting_data/Date_Code_Lookup.csv")
 
-q2_raw_df <- read.csv(MHSDS_q2_file_path)
+q2_main_raw_df <- read.csv(MHSDS_q2_main_file_path)
+q2_snap_raw_df <- read.csv(MHSDS_q2_snap_file_path)
 date_code_df <- read.csv(date_lookup)
 
 
 ## Filtering out of area patients
 
-q2_area_df <- q2_raw_df %>%
+q2_main_area_df <- q2_main_raw_df %>%
+  filter(SL_PRO_FLAG = 1)
+
+q2_snap_area_df <- q2_snap_raw_df %>%
   filter(SL_PRO_FLAG = 1)
 
 
-## Joining lookup file to raw Q3 data
+## Joining lookup file to raw Q4 data
 
-q2_dates_df <- left_join(q2_area_df, date_code_df, by = c("UniqMonthID" = "Code"))
+q2_main_dates_df <- left_join(q2_main_area_df, date_code_df, by = c("UniqMonthID" = "Code"))
+q2_snap_dates_df <- left_join(q2_snap_area_df, date_code_df, by = c("UniqMonthID" = "Code"))
+
+
+## Summarising the caseload per month based on the provider and ICB flags
+
+q2_main_proc_df <- q2_main_dates_df %>%
+  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
+  summarise(Referral_Count = n(), .groups = "drop") %>%
+  rename(Organisation_Name = ODS_Prov_orgName) %>%
+  mutate(Metric = "Caseload",
+         Geography = "Provider Specific") %>%
+  select(1, 6, 2, 3, 4, 5)
+
+q2_snap_proc_df <- q2_snap_dates_df %>%
+  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
+  summarise(Referral_Count = n(), .groups = "drop") %>%
+  rename(Organisation_Name = ODS_Prov_orgName) %>%
+  mutate(Metric = "Caseload",
+         Geography = "National Snapshot") %>%
+  select(1, 6, 2, 3, 4, 5)
+
+q2_caseload_summary <- rbind(q2_main_proc_df, q2_snap_proc_df)
+
+q2_caseload_summary <- q2_caseload_summary %>%
+  arrange(Month, Organisation_Name)
+
+write.csv(q2_caseload_summary, paste0(here(),"/data/processed_extracts/MHSDS_Q2_Caseload.csv"), row.names = FALSE)
 
 
 ## Filtering the raw Q2 data to isolate those living within most deprived quintile
 
-q2_dep_20 <- q2_dates_df %>%
+q2_dep_20 <- q2_main_dates_df %>%
   filter(IMD_Decile %in% c('1','2'))
 
-q2_dep_40 <- q2_dates_df %>%
+q2_dep_40 <- q2_main_dates_df %>%
   filter(IMD_Decile %in% c('3','4'))
 
-q2_dep_60 <- q2_dates_df %>%
+q2_dep_60 <- q2_main_dates_df %>%
   filter(IMD_Decile %in% c('5','6'))
 
-q2_dep_80 <- q2_dates_df %>%
+q2_dep_80 <- q2_main_dates_df %>%
   filter(IMD_Decile %in% c('7','8'))
 
-q2_dep_100 <- q2_dates_df %>%
+q2_dep_100 <- q2_main_dates_df %>%
   filter(IMD_Decile %in% c('9','10'))
 
 
 ## mutating the 'age' field to numeric
 
-q2_age_df <- q2_dates_df %>%
+q2_age_df <- q2_main_dates_df %>%
   mutate(AgeServReferRecDate = as.numeric(AgeServReferRecDate))
 
 
@@ -63,7 +95,7 @@ groupby_fct <- function(input, metric, cat_desc) {
 
 ## Summarising the caseload each month based on the ethnic group of referred patients
 
-q2_eth_total_df <- q2_dates_df %>%
+q2_eth_total_df <- q2_main_dates_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
@@ -71,7 +103,7 @@ q2_eth_total_df <- q2_dates_df %>%
          Ethnicity = "All") %>%
   select(1, 6, 7, 2, 3, 4, 5)
 
-q2_eth_spec_df <- q2_dates_df %>%
+q2_eth_spec_df <- q2_main_dates_df %>%
   mutate(Ethnicity = case_when(
     Ethnic_Category_Main_Desc %in% c('British','Irish') ~ "WhiteBritishIrish",
     Ethnic_Category_Main_Desc == 'Any other white background' ~ "OtherWhite",
@@ -120,7 +152,7 @@ write.csv(q2_dep_combined, paste0(here(),"/data/processed_extracts/MHSDS_Q2_Dep_
 
 ## Summarising the caseload each month based on the age group of referred patients
 
-q2_age_total_df <- q2_dates_df %>%
+q2_age_total_df <- q2_age_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
