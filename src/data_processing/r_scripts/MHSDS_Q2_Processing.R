@@ -1,5 +1,5 @@
 
-# Script for processing all demographic data related to the current caseload in perinatal MH services across English providers from April 2019 until February 2024
+# Script for processing all demographic data related to the current caseload in perinatal MH services across English providers for previous 36-months
 
 ## Loading Q2 data and data lookup files
 
