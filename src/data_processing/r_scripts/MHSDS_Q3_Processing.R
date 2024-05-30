@@ -3,7 +3,7 @@
 
 ## Loading Q3 data and data lookup files
 
-MHSDS_q3_file_path <- paste0(here(),"/data/raw_extracts/MHSDS_Q3_NOC_Referrals.csv")
+MHSDS_q3_file_path <- paste0(here(),"/data/raw_extracts/MHSDS_Q3_Referrals.csv")
 date_lookup <- paste0(here(),"/data/supporting_data/Date_Code_Lookup.csv")
 
 q3_raw_df <- read.csv(MHSDS_q3_file_path)
@@ -13,7 +13,7 @@ date_code_df <- read.csv(date_lookup)
 ## Filtering out of area patients
 
 q3_area_df <- q3_raw_df %>%
-  filter(SL_PRO_FLAG = 1)
+  filter(SL_PRO_FLAG == 1)
 
 
 ## Joining lookup file to raw Q3 data
@@ -90,8 +90,9 @@ q3_ref_Source_df <- q3_new_ref_df %>%
     SourceOfReferralMH %in% c('P1','H2','M9','Q1') ~ "SecondaryCare",
     SourceOfReferralMH %in% c('B1','B2') ~ "SelfReferral",
     SourceOfReferralMH %in% c('D1','M6','I2','M7','H1','M3','N3','C1','G3','C2','E2','F3','I1','F1','E1','F2','G4','M2','M4','E3','E4','E5','G1','M1','C3','D2','E6','G2','M5') ~ "OtherReferralSource",
-    TRUE ~ "MissingInvalid")) %>%
-  select(1, 7, 2, 3, 4, 5, 6) %>%
+    TRUE ~ "MissingInvalid"),
+    Metric = "New referrals - source") %>%
+  select(1, 8, 2, 3, 4, 7, 6) %>%
   arrange(Month, Organisation_Name)
 
 write.csv(q3_ref_Source_df, paste0(here(),"/data/processed_extracts/MHSDS_Q3_Ref_Source.csv"), row.names = FALSE)
