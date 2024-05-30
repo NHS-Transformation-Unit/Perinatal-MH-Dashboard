@@ -22,22 +22,37 @@ q4_area_df <- q4_raw_df %>%
 q4_dates_df <- left_join(q4_area_df, date_code_df, by = c("UniqMonthID" = "Code"))
 
 
+## Joining lookup file to raw Q4 data
+
+q4_dates_df <- left_join(q4_area_df, date_code_df, by = c("UniqMonthID" = "Code"))
+
+
 ## Summarising the referral count per month for new referrals, based on the provider and ICB flags
 
 q4_RTFc_Partnership <- q4_dates_df %>%
-  group_by(Month, Provider_Flag) %>%
-  summarise(Average_RTFc = mean(Days_First_Contact, na.rm = TRUE), .groups = "drop") %>%
+  mutate(RTFc_Weeks = case_when(
+    Days_First_Contact >= 84 ~ 'More than 12 Weeks',
+    Days_First_Contact >= 28 ~ '4 - 12 Weeks',
+    Days_First_Contact < 28 ~ 'Less than 4 Weeks',
+    TRUE ~ "NotKnown")) %>%
+  group_by(Month, Provider_Flag, RTFc_Weeks) %>%
+  summarise(Average_RTFc = mean(Days_First_Contact, na.rm = TRUE), Patient_Count = n(), .groups = "drop") %>%
   mutate(Metric = "Referral to First Contact", 
          Organisation_Name = "Partnership Summary",
          ICB_Flag = "Both") %>%
-  select(Month, Metric, Provider_Flag, ICB_Flag, Organisation_Name, Average_RTFc)
+  select(Month, Metric, Provider_Flag, ICB_Flag, Organisation_Name, RTFc_Weeks, Average_RTFc, Patient_Count)
 
 q4_RTFc_Individual <- q4_dates_df %>%
-  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
-  summarise(Average_RTFc = mean(Days_First_Contact, na.rm = TRUE), .groups = "drop") %>%
+  mutate(RTFc_Weeks = case_when(
+    Days_First_Contact >= 84 ~ 'More than 12 Weeks',
+    Days_First_Contact >= 28 ~ '4 - 12 Weeks',
+    Days_First_Contact < 28 ~ 'Less than 4 Weeks',
+    TRUE ~ "NotKnown")) %>%
+  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, RTFc_Weeks) %>%
+  summarise(Average_RTFc = mean(Days_First_Contact, na.rm = TRUE), Patient_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Referral to First Contact") %>%
-  select(Month, Metric, Provider_Flag, ICB_Flag, Organisation_Name, Average_RTFc)
+  select(Month, Metric, Provider_Flag, ICB_Flag, Organisation_Name, RTFc_Weeks, Average_RTFc, Patient_Count)
 
 q4_RTFc_Summary <- rbind(q4_RTFc_Partnership, q4_RTFc_Individual)
 
