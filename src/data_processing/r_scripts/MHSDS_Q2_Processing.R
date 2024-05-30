@@ -28,7 +28,7 @@ q2_snap_dates_df <- left_join(q2_snap_raw_df, date_code_df, by = c("UniqMonthID"
 
 q2_main_proc_df <- q2_main_dates_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
-  summarise(Referral_Count = n(), .groups = "drop") %>%
+  summarise(Caseload_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Caseload",
          Geography = "Provider Specific") %>%
@@ -36,7 +36,7 @@ q2_main_proc_df <- q2_main_dates_df %>%
 
 q2_snap_proc_df <- q2_snap_dates_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
-  summarise(Referral_Count = n(), .groups = "drop") %>%
+  summarise(Caseload_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Caseload",
          Geography = "National Snapshot") %>%
@@ -79,11 +79,11 @@ q2_age_df <- q2_main_dates_df %>%
 groupby_fct <- function(input, metric, cat_desc) {
   result_df <- input %>%
     group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
-    summarise(Referral_Count = n(), .groups = "drop") %>%
+    summarise(Caseload_Count = n(), .groups = "drop") %>%
     rename(Organisation_Name = ODS_Prov_orgName) %>%
     mutate(Metric = metric,
            IMD_Decile = cat_desc) %>%
-    select(Month, Metric, Provider_Flag, ICB_Flag, Organisation_Name, IMD_Decile, Referral_Count)
+    select(Month, Metric, Provider_Flag, ICB_Flag, Organisation_Name, IMD_Decile, Caseload_Count)
   
   return(result_df)
   
@@ -94,7 +94,7 @@ groupby_fct <- function(input, metric, cat_desc) {
 
 q2_eth_total_df <- q2_main_dates_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
-  summarise(Referral_Count = n(), .groups = "drop") %>%
+  summarise(Caseload_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Provider_Total",
          Ethnicity = "All") %>%
@@ -112,7 +112,7 @@ q2_eth_spec_df <- q2_main_dates_df %>%
     Ethnic_Category_Main_Desc == 'Missing / invalid' ~ "MissingInvalid",
     TRUE ~ "NotKnown")) %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Ethnicity) %>%
-  summarise(Referral_Count = n(), .groups = "drop") %>%
+  summarise(Caseload_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Provider_Specific") %>%
   select(1, 6, 2, 3, 4, 7, 5)
@@ -151,7 +151,7 @@ write.csv(q2_dep_combined, paste0(here(),"/data/processed_extracts/MHSDS_Q2_Dep_
 
 q2_age_total_df <- q2_age_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
-  summarise(Referral_Count = n(), .groups = "drop") %>%
+  summarise(Caseload_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Provider_Total",
          Age_Band = "All") %>%
@@ -165,7 +165,7 @@ q2_age_spec_df <- q2_age_df %>%
     AgeServReferRecDate >= 40 ~ "40+",
     TRUE ~ "NotKnown")) %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Age_Band) %>%
-  summarise(Referral_Count = n(), .groups = "drop") %>%
+  summarise(Caseload_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Provider_Specific") %>%
   select(1, 6, 2, 3, 4, 7, 5)
