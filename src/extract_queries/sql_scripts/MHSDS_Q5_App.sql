@@ -53,13 +53,6 @@ SELECT DISTINCT
     CARE.[AttendOrDNACode],
     ATT_STAT.[Main_Description] as [Attendance_Status],
     
-    CASE WHEN REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') THEN 'Providers'
-         ELSE 'Other' END AS [Provider_Flag],
-		
-	  CASE WHEN REF.[OrgIDProv] IN ('RRU', 'RPG', 'RJZ', 'RJ1', 'RV5', 'RJ2') THEN 'NHS South East London ICB'
-         WHEN REF.[OrgIDProv] IN ('RJ7', 'RAX', 'RQY', 'RY9', 'RJ6', 'RVR') THEN 'NHS South West London ICB'
-         ELSE 'Other' END AS [ICB_Flag],
-    
     COMM.[Organisation_Code],
     COMM.[Organisation_Name],
     COMM.[STP_Name],
