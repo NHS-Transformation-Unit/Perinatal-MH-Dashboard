@@ -27,7 +27,7 @@ q3_new_ref_df <- q3_dates_df %>%
   filter(NewReferrals == 1)
 
 q3_open_ref_df <- q3_dates_df %>%
-  filter(OpenReferrals == 1 & NewReferrals == 0)
+  filter(OpenReferrals == 1)
 
 q3_closed_ref_df <- q3_dates_df %>%
   filter(ClosedReferrals == 1)
