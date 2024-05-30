@@ -1,5 +1,5 @@
 
-# Script for prcessing the referral to first contact time for patients attending perinatal MH services across English providers from April 2019 until February 2024
+# Script for processing the referral to first contact time for patients attending perinatal MH services across English providers from April 2019 until February 2024
 
 
 ## Loading Q4 data and data lookup files
