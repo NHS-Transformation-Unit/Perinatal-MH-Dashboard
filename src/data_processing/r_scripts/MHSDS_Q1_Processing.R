@@ -16,16 +16,13 @@ date_code_df <- read.csv(date_lookup)
 ## Filtering out of area patients
 
 q1_main_area_df <- q1_main_raw_df %>%
-  filter(SL_PRO_FLAG = 1)
-
-q1_snap_area_df <- q1_snap_raw_df %>%
-  filter(SL_PRO_FLAG = 1)
+  filter(SL_PRO_FLAG == 1)
 
 
 ## Joining lookup file to raw Q4 data
 
 q1_main_dates_df <- left_join(q1_main_area_df, date_code_df, by = c("UniqMonthID" = "Code"))
-q1_snap_dates_df <- left_join(q1_snap_area_df, date_code_df, by = c("UniqMonthID" = "Code"))
+q1_snap_dates_df <- left_join(q1_snap_raw_df, date_code_df, by = c("UniqMonthID" = "Code"))
 
 
 ## Summarising the access count per month based on the provider and ICB flags
