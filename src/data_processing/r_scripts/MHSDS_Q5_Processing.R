@@ -156,7 +156,7 @@ q5_eth_total_df <- q5_dem_spec_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Appointment_Status) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
-  mutate(Metric = "Provider_Total",
+  mutate(Metric = "Ethnicity - Provider Total",
          Ethnicity = "All") %>%
   select(1, 7, 2, 3, 4, 5, 8, 6)
 
@@ -174,7 +174,7 @@ q5_eth_spec_df <- q5_dem_spec_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Appointment_Status, Ethnicity) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
-  mutate(Metric = "Provider_Specific") %>%
+  mutate(Metric = "Ethnicity - Provider Specific") %>%
   select(1, 8, 2, 3, 4, 5, 6, 7)
 
 q5_eth_combined <- rbind(q5_eth_total_df, q5_eth_spec_df)
@@ -187,12 +187,12 @@ write.csv(q5_eth_combined, paste0(here(),"/data/processed_extracts/MHSDS_Q5_Eth_
 
 ## Summarising the caseload each month based on the deprivation decile of referred patients
 
-q5_dep_total_df <- app_groupby_fct(q5_dem_spec_df, "Provider_Total", "All Quintiles (Deprivation)")
-q5_dep_20_df <- app_groupby_fct(q5_dep_20, "Provider_Specific", "First_Quintile (Deprivation)")
-q5_dep_40_df <- app_groupby_fct(q5_dep_40, "Provider_Specific", "Second_Quintile (Deprivation)")
-q5_dep_60_df <- app_groupby_fct(q5_dep_60, "Provider_Specific", "Third_Quintile (Deprivation)")
-q5_dep_80_df <- app_groupby_fct(q5_dep_80, "Provider_Specific", "Fourth_Quintile (Deprivation)")
-q5_dep_100_df <- app_groupby_fct(q5_dep_100, "Provider_Specific", "Fifth_Quintile (Deprivation)")
+q5_dep_total_df <- app_groupby_fct(q5_dem_spec_df, "Deprivation - Provider Total", "All Quintiles (Deprivation)")
+q5_dep_20_df <- app_groupby_fct(q5_dep_20, "Deprivation - Provider Specific", "First_Quintile (Deprivation)")
+q5_dep_40_df <- app_groupby_fct(q5_dep_40, "Deprivation - Provider Specific", "Second_Quintile (Deprivation)")
+q5_dep_60_df <- app_groupby_fct(q5_dep_60, "Deprivation - Provider Specific", "Third_Quintile (Deprivation)")
+q5_dep_80_df <- app_groupby_fct(q5_dep_80, "Deprivation - Provider Specific", "Fourth_Quintile (Deprivation)")
+q5_dep_100_df <- app_groupby_fct(q5_dep_100, "Deprivation - Provider Specific", "Fifth_Quintile (Deprivation)")
 
 q5_dep_combined <- rbind(q5_dep_total_df, 
                          q5_dep_20_df,
@@ -213,7 +213,7 @@ q5_age_total_df <- q5_dem_spec_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Appointment_Status) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
-  mutate(Metric = "Provider_Total",
+  mutate(Metric = "Age - Provider Total",
          Age_Band = "All") %>%
   select( 1, 7, 2, 3, 4, 5, 8, 6)
 
@@ -227,7 +227,7 @@ q5_age_spec_df <- q5_dem_spec_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Appointment_Status, Age_Band) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
-  mutate(Metric = "Provider_Specific") %>%
+  mutate(Metric = "Age - Provider Specific") %>%
   select(1, 8, 2, 3, 4, 5, 6, 7)
 
 q5_age_combined <- rbind(q5_age_total_df, q5_age_spec_df)
