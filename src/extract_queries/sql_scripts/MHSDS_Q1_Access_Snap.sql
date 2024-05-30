@@ -2,9 +2,12 @@
 -- Script to return perinatal access for all English providers during the previous 12-months
 
 DECLARE @EndRP INT;
-
+DECLARE @StartRP INT;
+ 
 SET @EndRP = (SELECT MAX(UniqMonthID)
-              FROM [NHSE_MHSDS].[dbo].[MHS101Referral]);
+              FROM [NHSE_MHSDS].[dbo].[MHS101Referral])
+ 
+SET @StartRP = (@EndRP - 12)
 
 SELECT DISTINCT
 
@@ -84,7 +87,7 @@ AND REF.[UniqServReqID] = DISC.[UniqServReqID]
 LEFT JOIN [NHSE_Reference].[dbo].[tbl_Ref_ODS_Commissioner_Hierarchies] AS COMM
 ON REF.[OrgIDComm] = COMM.[Organisation_Code]
 
-WHERE REF.[UniqMonthID] = @EndRP
+WHERE REF.[UniqMonthID] BETWEEN @StartRP AND @EndRP
 AND SERV.[ServTeamTypeRefToMH] = 'C02'
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2'
