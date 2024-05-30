@@ -14,7 +14,7 @@ date_code_df <- read.csv(date_lookup)
 ## Filtering out of area patients
 
 q4_area_df <- q4_raw_df %>%
-  filter(SL_PRO_FLAG = 1)
+  filter(SL_PRO_FLAG == 1)
 
 
 ## Joining lookup file to raw Q4 data
