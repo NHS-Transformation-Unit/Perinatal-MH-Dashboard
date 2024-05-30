@@ -36,31 +36,31 @@ q3_closed_ref_df <- q3_dates_df %>%
 ## Summarising the referral count per month for new referrals, based on the provider and ICB flags
 
 q3_new_proc_df <- q3_new_ref_df %>%
-  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
+  group_by(Month, ODS_Prov_orgName) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "New referrals") %>%
-  select(1, 6, 2, 3, 4, 5)
+  select(1, 4, 2, 3)
 
 
 ## Summarising the referral count per month for open referrals, based on the provider and ICB flags
 
 q3_open_proc_df <- q3_open_ref_df %>%
-  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
+  group_by(Month, ODS_Prov_orgName) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Open referrals") %>%
-  select(1, 6, 2, 3, 4, 5)
+  select(1, 4, 2, 3)
 
 
 ## Summarising the referral count per month for closed referrals, based on the provider and ICB flags
 
 q3_closed_proc_df <- q3_closed_ref_df %>%
-  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
+  group_by(Month, ODS_Prov_orgName) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Closed referrals") %>%
-  select(1, 6, 2, 3, 4, 5)
+  select(1, 4, 2, 3)
 
 
 ## Combining all processed dataframes into one for exporting
@@ -79,7 +79,7 @@ write.csv(q3_proc_combined, paste0(here(),"/data/processed_extracts/MHSDS_Q3_NOC
 ## Aggregating new referral sources
 
 q3_ref_Source_df <- q3_new_ref_df %>%
-  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, SourceOfReferralMH) %>%
+  group_by(Month, ODS_Prov_orgName, SourceOfReferralMH) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Referral_Source = case_when(
@@ -92,7 +92,7 @@ q3_ref_Source_df <- q3_new_ref_df %>%
     SourceOfReferralMH %in% c('D1','M6','I2','M7','H1','M3','N3','C1','G3','C2','E2','F3','I1','F1','E1','F2','G4','M2','M4','E3','E4','E5','G1','M1','C3','D2','E6','G2','M5') ~ "OtherReferralSource",
     TRUE ~ "MissingInvalid"),
     Metric = "New referrals - source") %>%
-  select(1, 8, 2, 3, 4, 7, 6) %>%
+  select(1, 6, 2, 5, 4) %>%
   arrange(Month, Organisation_Name)
 
 write.csv(q3_ref_Source_df, paste0(here(),"/data/processed_extracts/MHSDS_Q3_Ref_Source.csv"), row.names = FALSE)

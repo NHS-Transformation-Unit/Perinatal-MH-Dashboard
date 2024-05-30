@@ -25,12 +25,12 @@ q5_dates_df <- left_join(q5_area_df, date_code_df, by = c("UniqMonthID" = "Code"
 ## Summarising the attendance status count per month for each provider
 
 q5_app_total_df <- q5_dates_df %>%
-  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
+  group_by(Month, ODS_Prov_orgName) %>%
   summarise(Appointment_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Provider_Total",
          Appointment_Status = "All") %>%
-  select(1, 6, 7, 2, 3, 4, 5)
+  select(1, 4, 5, 2, 3)
 
 q5_app_spec_df <- q5_dates_df %>%
   mutate(Appointment_Status = case_when(
@@ -40,11 +40,11 @@ q5_app_spec_df <- q5_dates_df %>%
     AttendOrDNACode == '4' ~ "Provider cancellation",
     AttendOrDNACode == '3'  ~ "Did not attend",
     TRUE ~ "NotKnown")) %>%
-  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Appointment_Status) %>%
+  group_by(Month, ODS_Prov_orgName, Appointment_Status) %>%
   summarise(Appointment_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Provider_Specific") %>%
-  select(1, 7, 5, 2, 3, 4, 6)
+  select(1, 5, 3, 2, 4)
 
 q5_app_combined <- rbind(q5_app_total_df, q5_app_spec_df)
 
@@ -60,12 +60,12 @@ q5_con_df <- q5_dates_df %>%
   filter(AttendOrDNACode %in% c('5', '6'))
 
 q5_con_total_df <- q5_con_df %>%
-  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
+  group_by(Month, ODS_Prov_orgName) %>%
   summarise(Appointment_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Provider_Total",
          Contact_Mech = "All") %>%
-  select(1, 6, 7, 2, 3, 4, 5)
+  select(1, 4, 2, 5, 3)
 
 q5_con_spec_df <- q5_con_df %>%
   mutate(Contact_Mech = case_when(
@@ -84,11 +84,11 @@ q5_con_spec_df <- q5_con_df %>%
     ConsMechanismMH == '13'  ~ 'Chat Room (Synchronous)',
     ConsMechanismMH == '98'  ~ 'Other',
     TRUE ~ "NotKnown")) %>%
-  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Contact_Mech) %>%
+  group_by(Month, ODS_Prov_orgName, Contact_Mech) %>%
   summarise(Appointment_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Provider_Specific") %>%
-  select(1, 7, 5, 2, 3, 4, 6)
+  select(1, 5, 2, 3, 4)
 
 q5_con_combined <- rbind(q5_con_total_df, q5_con_spec_df)
 
@@ -138,12 +138,12 @@ q5_age_df <- q5_dem_spec_df %>%
 
 app_groupby_fct <- function(input, metric, cat_desc) {
   result_df <- input %>%
-    group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Appointment_Status) %>%
+    group_by(Month, ICB_Flag, ODS_Prov_orgName, Appointment_Status) %>%
     summarise(Referral_Count = n(), .groups = "drop") %>%
     rename(Organisation_Name = ODS_Prov_orgName) %>%
     mutate(Metric = metric,
            IMD_Decile = cat_desc) %>%
-    select(Month, Metric, Provider_Flag, ICB_Flag, Organisation_Name, Appointment_Status, IMD_Decile, Referral_Count)
+    select(Month, Metric, Organisation_Name, Appointment_Status, IMD_Decile, Referral_Count)
   
   return(result_df)
   
@@ -153,12 +153,12 @@ app_groupby_fct <- function(input, metric, cat_desc) {
 ## Summarising the caseload each month based on the ethnic group of referred patients
 
 q5_eth_total_df <- q5_dem_spec_df %>%
-  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Appointment_Status) %>%
+  group_by(Month, ODS_Prov_orgName, Appointment_Status) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Ethnicity - Provider Total",
          Ethnicity = "All") %>%
-  select(1, 7, 2, 3, 4, 5, 8, 6)
+  select(1, 5, 2, 3, 6, 4)
 
 q5_eth_spec_df <- q5_dem_spec_df %>%
   mutate(Ethnicity = case_when(
@@ -171,11 +171,11 @@ q5_eth_spec_df <- q5_dem_spec_df %>%
     Ethnic_Category_Main_Desc == 'Not stated' ~ "NotStated",
     Ethnic_Category_Main_Desc == 'Missing / invalid' ~ "MissingInvalid",
     TRUE ~ "NotKnown")) %>%
-  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Appointment_Status, Ethnicity) %>%
+  group_by(Month, ODS_Prov_orgName, Appointment_Status, Ethnicity) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Ethnicity - Provider Specific") %>%
-  select(1, 8, 2, 3, 4, 5, 6, 7)
+  select(1, 6, 2, 3, 4, 5)
 
 q5_eth_combined <- rbind(q5_eth_total_df, q5_eth_spec_df)
 
@@ -210,12 +210,12 @@ write.csv(q5_dep_combined, paste0(here(),"/data/processed_extracts/MHSDS_Q5_Dep_
 ## Summarising the caseload each month based on the age group of referred patients
 
 q5_age_total_df <- q5_dem_spec_df %>%
-  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Appointment_Status) %>%
+  group_by(Month, ODS_Prov_orgName, Appointment_Status) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Age - Provider Total",
          Age_Band = "All") %>%
-  select( 1, 7, 2, 3, 4, 5, 8, 6)
+  select( 1, 5, 2, 3, 6, 4)
 
 q5_age_spec_df <- q5_dem_spec_df %>%
   mutate(Age_Band = case_when(
@@ -224,11 +224,11 @@ q5_age_spec_df <- q5_dem_spec_df %>%
     AgeRepPeriodEnd >= 26 & AgeRepPeriodEnd < 40 ~ "26-39",
     AgeRepPeriodEnd >= 40 ~ "40+",
     TRUE ~ "NotKnown")) %>%
-  group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Appointment_Status, Age_Band) %>%
+  group_by(Month, ODS_Prov_orgName, Appointment_Status, Age_Band) %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Age - Provider Specific") %>%
-  select(1, 8, 2, 3, 4, 5, 6, 7)
+  select(1, 6, 2, 3, 4, 5)
 
 q5_age_combined <- rbind(q5_age_total_df, q5_age_spec_df)
 
