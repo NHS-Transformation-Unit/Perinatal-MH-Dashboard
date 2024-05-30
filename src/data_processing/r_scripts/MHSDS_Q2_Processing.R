@@ -21,7 +21,7 @@ q2_snap_area_df <- q2_snap_raw_df %>%
   filter(SL_PRO_FLAG = 1)
 
 
-## Joining lookup file to raw Q4 data
+## Joining lookup file to raw Q2 data
 
 q2_main_dates_df <- left_join(q2_main_area_df, date_code_df, by = c("UniqMonthID" = "Code"))
 q2_snap_dates_df <- left_join(q2_snap_area_df, date_code_df, by = c("UniqMonthID" = "Code"))
