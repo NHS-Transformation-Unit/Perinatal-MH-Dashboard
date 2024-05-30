@@ -34,9 +34,10 @@ q5_app_total_df <- q5_dates_df %>%
 
 q5_app_spec_df <- q5_dates_df %>%
   mutate(Appointment_Status = case_when(
-    AttendOrDNACode %in% c('5', '6')  ~ "Attended and seen",
-    AttendOrDNACode == '7'  ~ "Arrived late, not seen",
-    AttendOrDNACode %in% c('2', '4')  ~ "Appointment cancelled",
+    AttendOrDNACode %in% c('5', '6') ~ "Attended and seen",
+    AttendOrDNACode == '7' ~ "Arrived late, not seen",
+    AttendOrDNACode == '2' ~ "Patient cancellation",
+    AttendOrDNACode == '4' ~ "Provider cancellation",
     AttendOrDNACode == '3'  ~ "Did not attend",
     TRUE ~ "NotKnown")) %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Appointment_Status) %>%
@@ -58,7 +59,7 @@ write.csv(q5_app_combined, paste0(here(),"/data/processed_extracts/MHSDS_Q5_App_
 q5_con_df <- q5_dates_df %>%
   filter(AttendOrDNACode %in% c('5', '6'))
 
-q5_con_total_df <- q5_cont_df %>%
+q5_con_total_df <- q5_con_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
   summarise(Appointment_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
@@ -66,7 +67,7 @@ q5_con_total_df <- q5_cont_df %>%
          Contact_Mech = "All") %>%
   select(1, 6, 7, 2, 3, 4, 5)
 
-q5_con_spec_df <- q5_cont_df %>%
+q5_con_spec_df <- q5_con_df %>%
   mutate(Contact_Mech = case_when(
     ConsMechanismMH == '01'  ~ 'Face to Face',
     ConsMechanismMH == '02'  ~ 'Telephone',
