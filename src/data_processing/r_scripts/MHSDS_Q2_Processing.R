@@ -3,8 +3,8 @@
 
 ## Loading Q2 data and data lookup files
 
-MHSDS_q2_main_file_path <- paste0(here(),"/data/raw_extracts/MHSDS_Q2_Main_Caseload.csv")
-MHSDS_q2_snap_file_path <- paste0(here(),"/data/raw_extracts/MHSDS_Q2_Snap_Access.csv")
+MHSDS_q2_main_file_path <- paste0(here(),"/data/raw_extracts/MHSDS_Q2_Caseload_Main.csv")
+MHSDS_q2_snap_file_path <- paste0(here(),"/data/raw_extracts/MHSDS_Q2_Caseload_Snap.csv")
 date_lookup <- paste0(here(),"/data/supporting_data/Date_Code_Lookup.csv")
 
 q2_main_raw_df <- read.csv(MHSDS_q2_main_file_path)
@@ -15,16 +15,13 @@ date_code_df <- read.csv(date_lookup)
 ## Filtering out of area patients
 
 q2_main_area_df <- q2_main_raw_df %>%
-  filter(SL_PRO_FLAG = 1)
-
-q2_snap_area_df <- q2_snap_raw_df %>%
-  filter(SL_PRO_FLAG = 1)
+  filter(SL_PRO_FLAG == 1)
 
 
 ## Joining lookup file to raw Q2 data
 
 q2_main_dates_df <- left_join(q2_main_area_df, date_code_df, by = c("UniqMonthID" = "Code"))
-q2_snap_dates_df <- left_join(q2_snap_area_df, date_code_df, by = c("UniqMonthID" = "Code"))
+q2_snap_dates_df <- left_join(q2_snap_raw_df, date_code_df, by = c("UniqMonthID" = "Code"))
 
 
 ## Summarising the caseload per month based on the provider and ICB flags
@@ -35,7 +32,7 @@ q2_main_proc_df <- q2_main_dates_df %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Caseload",
          Geography = "Provider Specific") %>%
-  select(1, 6, 2, 3, 4, 5)
+  select(1, 6, 2, 3, 4, 7, 5)
 
 q2_snap_proc_df <- q2_snap_dates_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
@@ -43,7 +40,7 @@ q2_snap_proc_df <- q2_snap_dates_df %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Caseload",
          Geography = "National Snapshot") %>%
-  select(1, 6, 2, 3, 4, 5)
+  select(1, 6, 2, 3, 4, 7, 5)
 
 q2_caseload_summary <- rbind(q2_main_proc_df, q2_snap_proc_df)
 
@@ -85,8 +82,8 @@ groupby_fct <- function(input, metric, cat_desc) {
     summarise(Referral_Count = n(), .groups = "drop") %>%
     rename(Organisation_Name = ODS_Prov_orgName) %>%
     mutate(Metric = metric,
-           Category = cat_desc) %>%
-    select(Month, Metric, Category, Provider_Flag, ICB_Flag, Organisation_Name, Referral_Count)
+           IMD_Decile = cat_desc) %>%
+    select(Month, Metric, Provider_Flag, ICB_Flag, Organisation_Name, IMD_Decile, Referral_Count)
   
   return(result_df)
   
@@ -101,7 +98,7 @@ q2_eth_total_df <- q2_main_dates_df %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Provider_Total",
          Ethnicity = "All") %>%
-  select(1, 6, 7, 2, 3, 4, 5)
+  select(1, 6, 2, 3, 4, 7, 5)
 
 q2_eth_spec_df <- q2_main_dates_df %>%
   mutate(Ethnicity = case_when(
@@ -118,7 +115,7 @@ q2_eth_spec_df <- q2_main_dates_df %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Provider_Specific") %>%
-  select(1, 7, 5, 2, 3, 4, 6)
+  select(1, 6, 2, 3, 4, 7, 5)
 
 q2_eth_combined <- rbind(q2_eth_total_df, q2_eth_spec_df)
 
@@ -130,7 +127,7 @@ write.csv(q2_eth_combined, paste0(here(),"/data/processed_extracts/MHSDS_Q2_Eth_
 
 ## Summarising the caseload each month based on the deprivation decile of referred patients
 
-q2_dep_total_df <- groupby_fct(q2_dates_df, "Provider_Total", "All Quintiles (Deprivation)")
+q2_dep_total_df <- groupby_fct(q2_main_dates_df, "Provider_Total", "All Quintiles (Deprivation)")
 q2_dep_20_df <- groupby_fct(q2_dep_20, "Provider_Specific", "First_Quintile (Deprivation)")
 q2_dep_40_df <- groupby_fct(q2_dep_40, "Provider_Specific", "Second_Quintile (Deprivation)")
 q2_dep_60_df <- groupby_fct(q2_dep_60, "Provider_Specific", "Third_Quintile (Deprivation)")
@@ -158,7 +155,7 @@ q2_age_total_df <- q2_age_df %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Provider_Total",
          Age_Band = "All") %>%
-  select(1, 6, 7, 2, 3, 4, 5)
+  select(1, 6, 2, 3, 4, 7, 5)
 
 q2_age_spec_df <- q2_age_df %>%
   mutate(Age_Band = case_when(
@@ -171,7 +168,7 @@ q2_age_spec_df <- q2_age_df %>%
   summarise(Referral_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
   mutate(Metric = "Provider_Specific") %>%
-  select(1, 7, 5, 2, 3, 4, 6)
+  select(1, 6, 2, 3, 4, 7, 5)
 
 q2_age_combined <- rbind(q2_age_total_df, q2_age_spec_df)
 
