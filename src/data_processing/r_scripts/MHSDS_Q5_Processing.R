@@ -55,7 +55,7 @@ write.csv(q5_app_combined, paste0(here(),"/data/processed_extracts/MHSDS_Q5_App_
 
 ## Summarising the contact mechanism count per month for each provider
 
-q5_cont_df <- q5_dates_df
+q5_con_df <- q5_dates_df %>%
   filter(AttendOrDNACode %in% c('5', '6'))
 
 q5_con_total_df <- q5_cont_df %>%
