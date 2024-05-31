@@ -39,7 +39,7 @@ This codebase contains:
 1. The SQL queries for extracting all relevant data from MHSDS.
 2. The R scripts needed for processing the MHSDS data extracted using the SQL queries.
 
-To recreate the data pipeline created for this dashboard, users will need to ensure their working directory is structured as outlined in the [Repo Structure](## Repository Structure) section of this ReadMe. This can be completed using Git or by simply downloading a zipped version of the tool from this repository.
+To recreate the data pipeline created for this dashboard, users will need to ensure their working directory is structured as outlined in the [Repo Structure](##-Repository-Structure) section of this ReadMe. This can be completed using Git or by simply downloading a zipped version of the tool from this repository.
 
 Following the cloning of this repository to the user's preferred IDE, and assuming all the constituent files are located in the appropriate folders, all extracted MHSDS data can be processed by **running the `MHSDS_Processing_Pipeline.R` script** found within the `src > data_processing > r_scripts` folder. The processed data files, which are exported to the `data > processed_extracts` folder, can then be read into the MHSDS dashboard build. Please see the guidance located under `documentation > project_documentation` for a more in depth process outline.
 
