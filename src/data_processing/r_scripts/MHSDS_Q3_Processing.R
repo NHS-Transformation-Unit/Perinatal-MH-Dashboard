@@ -13,7 +13,7 @@ q3_snap_raw_df <- read.csv(MHSDS_q3_snap_file_path)
 
 ## Filtering out of area patients
 
-q3_main_area_df <- q3_raw_df %>%
+q3_main_area_df <- q3_main_raw_df %>%
   filter(SL_PRO_FLAG == 1)
 
 
