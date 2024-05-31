@@ -16,6 +16,22 @@ The data to inform the agreed metrics is exported from the Mental Health Service
 
 <br/>
 
+## The MHSDS extraction pipeline
+
+The data for this dashboard is processed following the pipeline outlined below:
+
+<br/>
+
+<img src="images/data_pipeline.png" alt="data pipeline" width="1000" align="centre"/>
+
+<br/>
+
+A series of SQL scripts have been developed to extract data for each constituent dashboard metric from MHSDS. The raw data is exported using these queries as a `.csv` file, before being imported to RStudio for processing. Within RStudio, a number of preprocessing scripts are utilised to process the raw data back into `.csv` files for importing into the Excel dashboard.
+
+<br/>
+
+Similarly, some data objects needed for the Excel dashboard are collected from the NHS England Perinatal Mental Health Dashboard available on the FutureNHS site. Guidance related to these datasets is included in the `tableau_extracts_guidance` document found within the `documentation > project_documentation` folder.
+
 ## Using the Repository
 
 This codebase contains:
@@ -23,11 +39,12 @@ This codebase contains:
 1. The SQL queries for extracting all relevant data from MHSDS.
 2. The R scripts needed for processing the MHSDS data extracted using the SQL queries.
 
-To recreate the data pipeline created for this dashboard, users will need to ensure their working directory is structured as outlined in the [Repo Structure](#repo-structure) section of this ReadMe. This can be completed using Git or by simply downloading a zipped version of the tool from this repository.
+To recreate the data pipeline created for this dashboard, users will need to ensure their working directory is structured as outlined in the [Repository Structure](##-Repository-Structure) section of this ReadMe. This can be undertaken by cloning the repository using Git or by simply downloading a zipped version of the tool from this repository.
 
-Following the cloning of this repository to the user's preferred IDE, and assuming all the constituent files are located in the appropriate folders, all extracted MHSDS data can be processed by **running the `MHSDS_Processing.R` script** found within the `src > data_processing > r_scripts` folder. The processed data files can then be read into the MHSDS dashboard file. Please see the guidance located under `documentation > project_documentation` for a more in depth process outline.
+Following the cloning of this repository to the user's preferred IDE, and assuming all the constituent files are located in the appropriate folders, all extracted MHSDS data can be processed by **running the `MHSDS_Processing_Pipeline.R` script** found within the `src > data_processing > r_scripts` folder. The processed data files, which are exported to the `data > processed_extracts` folder, can then be read into the MHSDS dashboard build. Please see the guidance located under `documentation > project_documentation` for a more in depth process outline.
 
-It is worth noting that whilst the SQL scripts for querying MHSDS can be run within IDE's such as RStudio, in this project the MHSDS SQL scripts were ran within NCDR and are as such outside of the R data pipeline.
+It is worth noting that whilst the SQL scripts for querying MHSDS can be run within IDE's such as RStudio, in this project the MHSDS SQL scripts were ran within NCDR using a remote desktop connection and are as such outside of the R data pipeline.
+
 
 <br/>
 
@@ -37,22 +54,28 @@ The current structure of the repository is detailed below:
 
 ``` plaintext
 
+├─── data
+     ├─── processed_extracts
+     ├─── raw_extracts
+     └─── supporting_data
 ├─── documentation
      └─── project_documentation
 ├─── images
 └─── src
-     ├─── extract_queries
+     ├─── config
           └─── sql_scripts
-               ├─── archived_scripts
-               └─── MHSDS_examples
      ├─── data_processing
           └─── r_scripts
-     └─── config
-          └─── r_scripts
+     └─── extract_queries
+          └─── sql_scripts
+
 
 ```
 
 <br/>
+
+### `data`
+This folder contain subfolders relating to raw **MHSDS extracts**, **processed MHSDS datasets** ready for importing to the Excel dashboard and **supporting data** such as a `Date_Code_Lookup` necessary for creating the processed extracts. 
 
 ### `documentation`
 This folder contain the project documentation, including brief summaries of each scripts purpose and the dashboard metrics they relate to.
