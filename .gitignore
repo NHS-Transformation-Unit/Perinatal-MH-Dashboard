@@ -55,3 +55,4 @@ rsconnect/
 # Excel and CSV files
 *.xlsx
 *.csv
+!data/supporting_data/Date_Code_Lookup.csv
