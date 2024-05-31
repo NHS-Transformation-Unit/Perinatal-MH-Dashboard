@@ -30,7 +30,7 @@ A series of SQL scripts have been developed to extract data for each constituent
 
 <br/>
 
-Similarly, some data objects needed for the Excel dashboard are collected from the NHS England Perinatal Mental Health Dashboard available on the FutureNHS site. Guidance related to these datasets is included in the `tableau_extract_guidance` document found within the `documentation > project_documentation` folder.
+Similarly, some data objects needed for the Excel dashboard are collected from the NHS England Perinatal Mental Health Dashboard available on the FutureNHS site. Guidance related to these datasets is included in the `tableau_extracts_guidance` document found within the `documentation > project_documentation` folder.
 
 ## Using the Repository
 
