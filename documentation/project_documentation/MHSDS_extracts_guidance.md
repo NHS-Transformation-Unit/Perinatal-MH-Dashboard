@@ -1,53 +1,46 @@
-# Running the Tool Guidance
+# The MHSDS Pipeline
 
 ## Introduction
-There are several ways in which the AIDF BI Support Geospatial Mapping Tool can be ran. This guidance provides an overview of the different approaches and the stages in which these need to be undertaken. There are two ways in which the tool can be ran:
+There are several different extracts from the Mental Health Services Data Set which are required to recreate the Perinatal MH Dashboard. Within this repository are seven individual scripts which can be ran on the National Commissioning Data Repository (NCDR) to create the required seven data extracts for this dashboard - these scripts are detailed within the [MHSDS SQL Scripts](#-MHSDS-SQL-Scripts) section of this documentation. Similarly, the R scripts used to process the seven data extracts into our 13 resultant data sets for the Excel dashboard are detailed within the [Processing R Scripts](#-Processing-R-Scripts) section of this document.
 
-* Knitting the `AIDF_Mapping_Tool.Rmd` file within the `src/r_scripts/geospatial` folder will run the tool and create the viewable instance of the tool itself, which can in turn be loaded into an external browser.
-* Running the individual geospatial mapping scripts to load the processed AIDF data and create distinct visualisations from it. This is more labour intensive but is useful for understanding the mechanics of the tool.
+In short, the process for refreshing the data for the Excel dashboard is as follows:
 
-<br/>
-
-## Amending Imaging Network/NHS Trust information
-All data related to the different Imaging Networks and NHS Trusts participating in the AIDF programme are located in the `AIDF_Geo_Final.csv` text file. Data can be changed directly within this file, but the file should always be saved within the `data/processed SFBC` folder with the same name.
+* Running each individual SQL script within NCDR to return the seven necessary MHSDS extracts for processing (and saving within an appropriate folder once the queries are complete - `data > raw_extracts`).
+* Running the R scripts for processing the seven MHSDS extracts which in turn create the 13 resultant processed datasets.
+* Loading the 13 processed data sets within the Excel dashboard as detailed within the `tableau_extracts_guidance.md` document located within the `documentation > project_documentation` folder.
 
 <br/>
 
 ## Packages
-As the model is built and ran within the R programming language it will require dependent packages to be installed by the user. These packages will only require installing once. Please ensure that these packages are installed prior to running the model. This can be undertaken by using the `install.packages()` command within the console. For example `install.packages(tidyr)` will install the `tidyr` package. For a full list of packages used in this model, please see the `packages.R` script found in the `config/r_scripts` folder.
+As the model is built and ran within the R programming language it will require dependent packages to be installed by the user. These packages will only require installing once. Please ensure that these packages are installed prior to running the model. This can be undertaken by using the `install.packages()` command within the console. For example `install.packages(here)` will install the `here` package. This can then be called with the `library(here)` command. 
+
+For a full list of packages used in this model, please see the `packages.R` script found in the `config/r_scripts` folder. Users may need to manually install the `here` package as exampled above.
 
 <br/>
 
-## Knitting the Model Outputs Document
-The file `AIDF_Mapping_Tool.Rmd` will run the tool and create the necessary visualisations for each part of the tool. The output of this is an .`html` file that can be viewed and shared with others. To create this file ensure that the all files are saved to their respective folders as per the online repository. Changing the location of these files will result in the tool not initialising. The outputs can be created by **knitting** the document. This can be achieved by either clicking the `Knit` button or by using `Ctrl+Shift+K` command. The output will then render and load the knitted document into a viewing window. The output will also be available within the `src/geospatial` folder as an `.html` file.
+## MHSDS SQL Scripts
+Each of the SQL scripts have been developed with a dynamic data range. This means that the analyst running the SQL scripts does not need to edit the scripts when they refresh the data. Each script should be ran within NCDR before exporting the resulting query to the `data > raw_extracts` folder.
+
+The MHSDS SQL scripts included within this repository are as follows:
+
+* `MHSDS_Q1_Access.sql` - script for returning a count of women who have had at least one contact with a community based, specialist perinatal mental health service in the rolling 12 month period - specific to South London providers over the previous 36-months.
+* `MHSDS_Q2_Caseload_Main.sql` - script for returning the number of referrals to a community based, specialist perinatal mental health service that were open at the end of the reporting month and have had at least one attended Face to Face or Video consultation contact since the referral was opened - specific to South London providers over the previous 36-months.
+* `MHSDS_Q2_Caseload_Snap.sql` - script for returning the number of referrals to a community based, specialist perinatal mental health service that were open at the end of the reporting month and have had at least one attended Face to Face or Video consultation contact since the referral was opened - national snapshot (all English providers) for the most recent complete reporting period.
+* `MHSDS_Q3_Referral_Main.sql` - script for returning all new, open and closed referrals to a specialist perinatal mental health service - specific to South London providers over the previous 36-months.
+* `MHSDS_Q3_Referral_Snap.sql` - script for returning all new, open and closed referrals to a specialist perinatal mental health service - national snapshot (all English providers) for the most recent complete reporting period.
+* `MHSDS_Q4_RTFc.sql` - script for returning a detailed summary of the referral to first contact time (in days) for women who have been in contact with a community based, specialist perinatal mental health service - specific to South London providers over the previous 36-months.
+* `MHSDS_Q5_App.sql` - script for returning a detailed summary of the attendance status and contact mechanisms of women who have been in contact with a community based, specialist perinatal mental health service - specific to South London providers over the previous 36-months.
 
 <br/>
 
-## Running the Model in Stages
-The tool can be created in stages. This will take longer and requires the model objects to be created in order. However, this will be helpful for the user to understand how the tool functions. The order for running is:
+## Processing R Scripts
+All processing scripts developed for this pipeline again require no input from the user. The entire processing pipeline can be ran automatically by running the `MHSDS_Processing_Pipeline.R` script located within the `src > data_processing > r_scripts` folder. This master script will run the five processing scripts in sequence and save the resultant 13 processed data files within the `data > processed_extracts` folder.
 
-1. Run the `src/config/r_scripts/packages.R` script. This will load all required packages into the library.
-2. Run the `src/geospatial/r_scripts/geojson.R` script. This will load the MSOA ShapeFile and ensure it is in the right format to be utilised by the `leaflet()` package.
-3. Run the `src/geospatial/r_scripts/implementation/implementation_mapping.R` script. This will not only load the `AIDF_Geo_Final.csv` file into the environment, but will also begin to create and filter the appropriate geospatial dataframes for use within the `shiny()` applications built by this script for loading into the `AIDF_Mapping_Tool.Rmd` file. These geospatial dataframes relate specifically to the implementation mapping section of the output.
-4. Run the `src/geospatial/r_scripts/modality/modality_mapping.R` script. This script creates further geospatial dataframes visualising specific imaging modalities for use by the `leaflet()` visualisations built by this script for loading into the `AIDF_Mapping_Tool.Rmd` file.
-5. Run the `src/geospatial/r_scripts/network/network_mapping.R` script. This script creates further geospatial dataframes visualising specific imaging modalities for use within the `shiny()` applications built by this script for loading into the `AIDF_Mapping_Tool.Rmd` file. These geospatial dataframes relate specifically to the network mapping section of the output.
+The processing R scripts included within this repository are as follows:
 
-Running these scripts in sequence will allow users to create three distinct visualisations outside of the `.Rmd` output.
-
-<br/>
-
-## Archived Data
-Included within this repository are a number of data files and scripts related to previous iterations of the AIDF BI Support Geospatial Mapping Tool pipeline. The scripts located in `src/processing (archived` folder were created for taking the raw SFBC Excel files from the AIDF NHS Futures site and processing them into a usable format for the creation of the geospatial tool. These files have been modified to access data files within their new archived locations.
-
-The archived scripts can be ran in the following order to reprocess raw SFBC data files:
-
-1. `SFBC_Load.R` - this script uses a function to extract key information fields from the raw SFBC files.
-2. `SFBC_ETL.R` - this script processes the raw data pulled from SFBC files to ready it for cleaning.
-3. `SFBC_Clean.R` - this script cleans the output of the previous script to ensure no fields are missing, names are consistent with AIDF documentation and organisational codes are accurate.
-4. `SFBC_Join.R` - thie script joins the cleaned SFBC data to supplementary AIDF information and NCDR accessed NHS Trust latitude and longitude data. The output of this fourth script is the processed `AIDF_Geo_Final.csv` file used in the latest iteration of the model.
-
-To ensure the above scripts work, a number of data files need to be present in archived data folders. These are as follows:
-
-1. Raw SFBC files - these raw SFBC Excel files are taken from the AIDF NHS Futures site and saved within the `data/archived/raw SFBC` folder. They have the naming convention `X_SFBC.xlsx` where 'X' is the imaging network ID. These IDs are available on request, as well as present in the `SFBC_Clean.R` script.
-2. `AIDF_Network_Summary.xlsx` - this data file contains supplementary data provided by the AIDF programme team and saved within the `data/archived/TU summaries` folder. Available upon request.
-3. `NCDR_reference_locations.xlsx` - this data file functions as a lookup between NHS Trust organisation code, latitude and longitude and saved within the `data/archived/geospatial` folder. Accessed from NCDR and available upon request.
+* `MHSDS_Processing_Pipeline.R` - master script for running all constituent processing scripts in sequence.
+* `MHSDS_Q1_Processing.R` - script for processing access data - returns the `MHSDS_Q1_Access.csv` summary file.
+* `MHSDS_Q2_Processing.R` - script for processing caseload data - returns the `MHSDS_Q2_Caseload.csv` summary file, as well as caseload demographic summaries for age, deprivation and ethnicity (`MHSDS_Q2_Age_Combined.csv`, `MHSDS_Q2_Dep_Combined.csv` and `MHSDS_Q2_Age_Combined.csv`, respectively).
+* `MHSDS_Q3_Processing.R` - script for processing referrals (new, open and closed) data - returns the `MHSDS_Q3_NOC_Referrals.csv` summary file, as well as the referral source summary file `MHSDS_Q3_Ref_Source.csv`.
+* `MHSDS_Q4_Processing.R` - script for processing referral to first contact data - returns the `MHSDS_Q4_RTFc.csv` summary file.
+* `MHSDS_Q2_Processing.R` - script for processing attendance status and contact mechanism data - returns the `MHSDS_Q5_App_Combined.csv` and `MHSDS_Q5_Con_Combined.csv` summary files, as well as attendance demographic summaries for age, deprivation and ethnicity (`MHSDS_Q5_Age_Combined.csv`, `MHSDS_Q5_Dep_Combined.csv` and `MHSDS_Q5_Age_Combined.csv`, respectively).
