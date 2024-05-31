@@ -30,17 +30,15 @@ q2_main_proc_df <- q2_main_dates_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
   summarise(Caseload_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
-  mutate(Metric = "Caseload",
-         Geography = "Provider Specific") %>%
-  select(1, 6, 2, 3, 4, 7, 5)
+  mutate(Metric = "Caseload") %>%
+  select(1, 6, 2, 3, 4, 5)
 
 q2_snap_proc_df <- q2_snap_dates_df %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName) %>%
   summarise(Caseload_Count = n(), .groups = "drop") %>%
   rename(Organisation_Name = ODS_Prov_orgName) %>%
-  mutate(Metric = "Caseload",
-         Geography = "National Snapshot") %>%
-  select(1, 6, 2, 3, 4, 7, 5)
+  mutate(Metric = "Caseload") %>%
+  select(1, 6, 2, 3, 4, 5)
 
 q2_caseload_summary <- rbind(q2_main_proc_df, q2_snap_proc_df)
 
