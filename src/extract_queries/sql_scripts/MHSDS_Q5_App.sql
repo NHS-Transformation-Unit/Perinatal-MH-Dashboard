@@ -1,5 +1,5 @@
 
--- Script to return the contact mechanism that patients referred to perinatal MH services access across all English providers during the previous 36-months
+-- Script to return the contact mechanism that patients referred to perinatal MH services access across specific South London providers during the previous 36-months
 
 DECLARE @EndRP INT;
 DECLARE @StartRP INT;

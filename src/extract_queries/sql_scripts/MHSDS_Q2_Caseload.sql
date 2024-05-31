@@ -1,5 +1,5 @@
 
--- Script to return perinatal caseload for all English providers during the previous 36-months
+-- Script to return perinatal caseload for specific South London providers during the previous 36-months
 
 DECLARE @EndRP INT;
 DECLARE @StartRP INT;
