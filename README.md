@@ -45,6 +45,7 @@ Following the cloning of this repository to the user's preferred IDE, and assumi
 
 It is worth noting that whilst the SQL scripts for querying MHSDS can be run within IDE's such as RStudio, in this project the MHSDS SQL scripts were ran within NCDR using a remote desktop connection and are as such outside of the R data pipeline.
 
+
 <br/>
 
 ## Repository Structure
@@ -67,6 +68,7 @@ The current structure of the repository is detailed below:
           └─── r_scripts
      └─── extract_queries
           └─── sql_scripts
+
 
 ```
 
