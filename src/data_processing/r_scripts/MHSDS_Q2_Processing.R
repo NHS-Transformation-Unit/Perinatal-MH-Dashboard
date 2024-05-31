@@ -43,7 +43,8 @@ q2_snap_proc_df <- q2_snap_dates_df %>%
 q2_caseload_summary <- rbind(q2_main_proc_df, q2_snap_proc_df)
 
 q2_caseload_summary <- q2_caseload_summary %>%
-  arrange(Month, Organisation_Name)
+  arrange(Month, Organisation_Name) %>%
+  distinct()
 
 write.csv(q2_caseload_summary, paste0(here(),"/data/processed_extracts/MHSDS_Q2_Caseload.csv"), row.names = FALSE)
 
