@@ -159,7 +159,9 @@ q2_age_spec_df <- q2_age_df %>%
   mutate(Age_Band = case_when(
     AgeServReferRecDate >= 16 & AgeServReferRecDate < 21 ~ "16-20",
     AgeServReferRecDate >= 21 & AgeServReferRecDate < 26 ~ "21-25",
-    AgeServReferRecDate >= 26 & AgeServReferRecDate < 40 ~ "26-39",
+    AgeServReferRecDate >= 26 & AgeServReferRecDate < 31 ~ "26-30",
+    AgeServReferRecDate >= 31 & AgeServReferRecDate < 36 ~ "31-35",
+    AgeServReferRecDate >= 36 & AgeServReferRecDate < 40 ~ "36-39",
     AgeServReferRecDate >= 40 ~ "40+",
     TRUE ~ "NotKnown")) %>%
   group_by(Month, Provider_Flag, ICB_Flag, ODS_Prov_orgName, Age_Band) %>%

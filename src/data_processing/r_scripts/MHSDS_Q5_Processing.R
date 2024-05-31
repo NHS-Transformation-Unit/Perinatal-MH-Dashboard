@@ -221,7 +221,9 @@ q5_age_spec_df <- q5_dem_spec_df %>%
   mutate(Age_Band = case_when(
     AgeRepPeriodEnd >= 16 & AgeRepPeriodEnd < 21 ~ "16-20",
     AgeRepPeriodEnd >= 21 & AgeRepPeriodEnd < 26 ~ "21-25",
-    AgeRepPeriodEnd >= 26 & AgeRepPeriodEnd < 40 ~ "26-39",
+    AgeRepPeriodEnd >= 26 & AgeRepPeriodEnd < 31 ~ "26-30",
+    AgeRepPeriodEnd >= 31 & AgeRepPeriodEnd < 36 ~ "31-35",
+    AgeRepPeriodEnd >= 36 & AgeRepPeriodEnd < 40 ~ "36-39",
     AgeRepPeriodEnd >= 40 ~ "40+",
     TRUE ~ "NotKnown")) %>%
   group_by(Month, ODS_Prov_orgName, Appointment_Status, Age_Band) %>%
