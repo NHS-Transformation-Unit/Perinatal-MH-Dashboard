@@ -83,6 +83,13 @@ SELECT DISTINCT
     CASE WHEN (REF.[ServDischDate] IS NULL OR REF.[ServDischDate] > SF.[ReportingPeriodEndDate]) AND SERV.[ReferRejectionDate] IS NULL THEN 1 ELSE 0 END AS OpenReferrals,
     CASE WHEN REF.[ReferralRequestReceivedDate] BETWEEN SF.[ReportingPeriodStartDate] AND SF.[ReportingPeriodEndDate] THEN 1 ELSE 0 END AS NewReferrals,
     CASE WHEN REF.[ServDischDate] BETWEEN SF.[ReportingPeriodStartDate] AND SF.[ReportingPeriodEndDate] THEN 1 ELSE 0 END AS ClosedReferrals,
+    
+    CASE WHEN REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') THEN 'Providers'
+         ELSE 'Other' END AS [Provider_Flag],
+		      
+    CASE WHEN REF.[OrgIDProv] IN ('RRU', 'RPG', 'RJZ', 'RJ1', 'RV5', 'RJ2') THEN 'NHS South East London ICB'
+         WHEN REF.[OrgIDProv] IN ('RJ7', 'RAX', 'RQY', 'RY9', 'RJ6', 'RVR') THEN 'NHS South West London ICB'
+         ELSE 'Other' END AS [ICB_Flag],
 		
 		COMM.[Organisation_Code],
     COMM.[Organisation_Name],
