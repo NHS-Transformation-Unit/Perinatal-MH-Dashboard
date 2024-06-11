@@ -1,13 +1,13 @@
 # The MHSDS Pipeline
 
 ## Introduction
-There are several different extracts from the Mental Health Services Data Set which are required to recreate the Perinatal MH Dashboard. Within this repository are seven individual scripts which can be ran on the National Commissioning Data Repository (NCDR) to create the required seven data extracts for this dashboard - these scripts are detailed within the [MHSDS SQL Scripts](#-MHSDS-SQL-Scripts) section of this documentation. Similarly, the R scripts used to process the seven data extracts into our 13 resultant data sets for the Excel dashboard are detailed within the [Processing R Scripts](#-Processing-R-Scripts) section of this document.
+There are several different extracts from the Mental Health Services Data Set which are required to recreate the Perinatal MH Dashboard. Within this repository are seven individual scripts which can be ran on the National Commissioning Data Repository (NCDR) to create the required seven data extracts for this dashboard - these scripts are detailed within the [MHSDS SQL Scripts](#-MHSDS-SQL-Scripts) section of this documentation. Similarly, the R scripts used to process the seven data extracts into our 16 resultant data sets for the Excel dashboard are detailed within the [Processing R Scripts](#-Processing-R-Scripts) section of this document.
 
 In short, the process for refreshing the data for the Excel dashboard is as follows:
 
 * Running each individual SQL script within NCDR to return the seven necessary MHSDS extracts for processing (and saving within an appropriate folder once the queries are complete - `data > raw_extracts`).
-* Running the R scripts for processing the seven MHSDS extracts which in turn create the 13 resultant processed datasets.
-* Loading the 13 processed data sets within the Excel dashboard as detailed within the `tableau_extracts_guidance.md` document located within the `documentation > project_documentation` folder.
+* Running the R scripts for processing the seven MHSDS extracts which in turn create the 16 resultant processed datasets.
+* Loading the 16 processed data sets within the Excel dashboard as detailed within the `tableau_extracts_guidance.md` document located within the `documentation > project_documentation` folder.
 
 <br/>
 
@@ -34,7 +34,7 @@ The MHSDS SQL scripts included within this repository are as follows:
 <br/>
 
 ## Processing R Scripts
-All processing scripts developed for this pipeline again require no input from the user. The entire processing pipeline can be ran automatically by running the `MHSDS_Processing_Pipeline.R` script located within the `src > data_processing > r_scripts` folder. This master script will run the five processing scripts in sequence and save the resultant 13 processed data files within the `data > processed_extracts` folder.
+All processing scripts developed for this pipeline again require no input from the user. The entire processing pipeline can be ran automatically by running the `MHSDS_Processing_Pipeline.R` script located within the `src > data_processing > r_scripts` folder. This master script will run the five processing scripts in sequence and save the resultant 16 processed data files within the `data > processed_extracts` folder.
 
 The processing R scripts included within this repository are as follows:
 
@@ -43,4 +43,4 @@ The processing R scripts included within this repository are as follows:
 * `MHSDS_Q2_Processing.R` - script for processing caseload data - returns the `MHSDS_Q2_Caseload.csv` summary file, as well as caseload demographic summaries for age, deprivation and ethnicity (`MHSDS_Q2_Age_Combined.csv`, `MHSDS_Q2_Dep_Combined.csv` and `MHSDS_Q2_Age_Combined.csv`, respectively).
 * `MHSDS_Q3_Processing.R` - script for processing referrals (new, open and closed) data - returns the `MHSDS_Q3_NOC_Referrals.csv` summary file, as well as the referral source summary file `MHSDS_Q3_Ref_Source.csv`.
 * `MHSDS_Q4_Processing.R` - script for processing referral to first contact data - returns the `MHSDS_Q4_RTFc.csv` summary file.
-* `MHSDS_Q2_Processing.R` - script for processing attendance status and contact mechanism data - returns the `MHSDS_Q5_App_Combined.csv` and `MHSDS_Q5_Con_Combined.csv` summary files, as well as attendance demographic summaries for age, deprivation and ethnicity (`MHSDS_Q5_Age_Combined.csv`, `MHSDS_Q5_Dep_Combined.csv` and `MHSDS_Q5_Age_Combined.csv`, respectively).
+* `MHSDS_Q2_Processing.R` - script for processing attendance status and contact mechanism data - returns the `MHSDS_Q5_App_Combined.csv` and `MHSDS_Q5_Con_Combined.csv` summary files, as well as attendance demographic summaries for age, deprivation and ethnicity for both subsets.
