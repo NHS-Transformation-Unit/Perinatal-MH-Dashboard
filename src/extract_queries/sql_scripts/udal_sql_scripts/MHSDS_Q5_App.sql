@@ -46,19 +46,18 @@ SELECT DISTINCT
     SERV.[UniqCareProfTeamID],
     SERV.[ServTeamTypeRefToMH],
     ETH.[Main_Description_60_Chars],
-    --IMD.[IMD_Decile],
+    IMD.[IMD_Decile],
     REF_PROS.[Organisation_Code],
     CARE.[CareContDate],
     CARE.[ConsMechanismMH],
     CARE.[AttendOrDNACode],
-    --ATT_STAT.[Main_Description] as [Attendance_Status],
+    ATT_STAT.[Main_Description] as [Attendance_Status],
+    COMM.[Organisation_Code],
+    COMM.[Organisation_Name],
+    COMM.[STP_Name],
+    COMM.[STP_Code],
     
-    --COMM.[Organisation_Code],
-    --COMM.[Organisation_Name],
-    --COMM.[STP_Name],
-    --COMM.[STP_Code],
-    
-    --CASE WHEN COMM.[STP_Code] IN ('QWE', 'QKK') THEN 1 ELSE 0 END AS [SL_ICB_FLAG],
+    CASE WHEN COMM.[STP_Code] IN ('QWE', 'QKK') THEN 1 ELSE 0 END AS [SL_ICB_FLAG],
     CASE WHEN REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') THEN 1 ELSE 0 END AS [SL_PRO_FLAG]
 
 FROM [Reporting_MESH_MHSDS].[MHS101Referral_Published] AS REF
@@ -81,31 +80,28 @@ LEFT JOIN [UKHD_Data_Dictionary].[Service_Or_Team_Type_For_Mental_Health_SCD] AS
 ON SERV.[ServTeamTypeRefToMH] = STYPE.[Main_Code_Text]
 AND STYPE.[Is_Latest] = '1'
 
-LEFT JOIN [Internal_Reference].[Site] AS REF_PROS
+LEFT JOIN [Internal_Reference].[Provider_Geography] AS REF_PROS
 ON REF.[OrgIDProv] = REF_PROS.[Organisation_Code]
 
---LEFT JOIN [NHSE_Reference].[dbo].[tbl_Ref_Other_Deprivation_By_LSOA] as [IMD]
---ON MPI.[LSOA2011] = IMD.[LSOA_Code]
---AND IMD.[Effective_Snapshot_Date] = '2019-12-31'
+LEFT JOIN [UKHF_Demography].[Domains_Of_Deprivation_By_LSOA1] as IMD
+ON MPI.[LSOA2011] = IMD.[LSOA_Code]
+AND IMD.[Effective_Snapshot_Date] = '2019-12-31'
 
 LEFT JOIN [Reporting_MESH_MHSDS].[MHS201CareContact_Published] AS CARE
 ON REF.[Der_Person_ID] = CARE.[Der_Person_ID] 
 AND REF.[UniqServReqID] = CARE.[UniqServReqID]
 
---LEFT JOIN [NHSE_UKHF].[Data_Dictionary].[vw_Attended_Or_Did_Not_Attend_SCD] AS [ATT_STAT]
---ON CARE.[AttendOrDNACode] = ATT_STAT.[Main_Code_Text]
---AND ATT_STAT.[Is_Latest] = '1'
+LEFT JOIN [UKHD_Data_Dictionary].[Attended_Or_Did_Not_Attend_SCD] AS [ATT_STAT]
+ON CARE.[AttendOrDNACode] = ATT_STAT.[Main_Code_Text]
+AND ATT_STAT.[Is_Latest] = '1'
 
---LEFT JOIN [NHSE_Reference].[dbo].[tbl_Ref_ODS_Commissioner_Hierarchies] AS COMM
---ON REF.[OrgIDComm] = COMM.[Organisation_Code]
+LEFT JOIN [Reporting_UKHD_ODS].[Commissioner_Hierarchies_ICB] AS COMM
+ON REF.[OrgIDComm] = COMM.[Organisation_Code]
 
 WHERE REF.[UniqMonthID] BETWEEN @StartRP AND @EndRP
 AND SERV.[ServTeamTypeRefToMH] = 'C02'
-AND (REF.[OrgIDProv] IN ('RV5'--,'RPG', 'RQY'
-	) --OR COMM.[STP_Code] IN ('QWE', 'QKK')
-	)
+AND (REF.[OrgIDProv] IN ('RV5','RPG', 'RQY') OR COMM.[STP_Code] IN ('QWE', 'QKK'))
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2'
 AND CARE.[CareContDate] BETWEEN SF.[ReportingPeriodStartDate] AND SF.[ReportingPeriodEndDate]
-AND CARE.[CareContDate] IS NOT NULL
-;
+AND CARE.[CareContDate] IS NOT NULL;
