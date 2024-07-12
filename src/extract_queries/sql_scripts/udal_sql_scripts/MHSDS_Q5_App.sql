@@ -7,7 +7,7 @@ DECLARE @StartRP INT;
 SET @EndRP = (SELECT MAX(UniqMonthID)
               FROM [Reporting_MESH_MHSDS].[MHS101Referral_Published])
  
-SET @StartRP = (@EndRP - 2)
+SET @StartRP = (@EndRP - 36)
 
 SELECT DISTINCT
 
