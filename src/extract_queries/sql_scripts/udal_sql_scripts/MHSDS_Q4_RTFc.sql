@@ -131,7 +131,7 @@ AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2'
 AND REF.[ReferralRequestReceivedDate] BETWEEN SF.[ReportingPeriodStartDate] AND SF.[ReportingPeriodEndDate]
 AND CARE.[ConsMechanismMH] IN ('01', '11')
-AND CARE.[AttendOrDNACode] IN ('5', '6')
+AND CARE.[AttendStatus] IN ('5', '6')
 AND CARE.[CareContDate] IS NOT NULL
 
 SELECT *,
