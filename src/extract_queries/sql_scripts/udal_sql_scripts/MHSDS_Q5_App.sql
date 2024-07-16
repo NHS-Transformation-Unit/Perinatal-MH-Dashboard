@@ -50,7 +50,7 @@ SELECT DISTINCT
     REF_PROS.[Organisation_Name] AS [ODS_Prov_orgName],
     CARE.[CareContDate],
     CARE.[ConsMechanismMH],
-    CARE.[AttendOrDNACode],
+    CARE.[AttendStatus] as [AttendOrDNACode],
     ATT_STAT.[Main_Description] as [Attendance_Status],
     COMM.[Organisation_Code],
     COMM.[Organisation_Name],
@@ -92,7 +92,7 @@ ON REF.[Der_Person_ID] = CARE.[Der_Person_ID]
 AND REF.[UniqServReqID] = CARE.[UniqServReqID]
 
 LEFT JOIN [UKHD_Data_Dictionary].[Attended_Or_Did_Not_Attend_SCD] AS [ATT_STAT]
-ON CARE.[AttendOrDNACode] = ATT_STAT.[Main_Code_Text]
+ON CARE.[AttendStatus] = ATT_STAT.[Main_Code_Text]
 AND ATT_STAT.[Is_Latest] = '1'
 
 LEFT JOIN [Reporting_UKHD_ODS].[Commissioner_Hierarchies_ICB] AS COMM
