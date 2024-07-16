@@ -28,7 +28,7 @@ SELECT DISTINCT
     MPI.[LSOA2011],
     IMD.[IMD_Decile],
     CARE.[CareContDate],
-    CARE.[AttendOrDNACode],
+    CARE.[AttendStatus] as [AttendOrDNACode],
     CARE.[ConsMechanismMH],
 
     CASE WHEN CARE.[CareContDate] > SF.[ReportingPeriodEndDate] THEN 0 
@@ -96,7 +96,7 @@ AND MPI.[Gender] = '2'
 AND (REF.[ServDischDate] IS NULL OR REF.[ServDischDate] > SF.[ReportingPeriodEndDate])
 AND DISC.[ReferRejectionDate] IS NULL
 AND CARE.[ConsMechanismMH] IN ('01', '11')
-AND CARE.[AttendOrDNACode] IN ('5', '6')
+AND CARE.[AttendStatus] IN ('5', '6')
 AND CARE.[CareContDate] IS NOT NULL
 
 SELECT *,
