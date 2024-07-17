@@ -8,6 +8,8 @@ packages <- c("here",
               "purrr",
               "tidyr",
               "stringr",
+              "openxlsx",
+              "readxl",
               "dplyr")
 
 lapply(packages, library, character.only=TRUE)
