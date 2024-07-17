@@ -29,7 +29,7 @@ SELECT DISTINCT
     MPI.[LSOA2011],
     IMD.[IMD_Decile],
     CARE.[CareContDate],
-    CARE.[AttendOrDNACode],
+    CARE.[AttendStatus] as [AttendOrDNACode],
     CARE.[ConsMechanismMH],
 
     CASE WHEN CARE.[CareContDate] > SF.[ReportingPeriodEndDate] THEN 0 ELSE 1 END AS [Count],
@@ -94,7 +94,7 @@ AND (REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') OR COMM.[STP_Code] IN ('QWE', 'QKK
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2'
 AND CARE.[ConsMechanismMH] IN ('01', '11')
-AND CARE.[AttendOrDNACode] IN ('5', '6')
+AND CARE.[AttendStatus] IN ('5', '6')
 AND CARE.[CareContDate] >= '2023-04-01'
 
 SELECT [OrgIDProv],[ODS_Prov_orgName], COUNT(DISTINCT Der_Person_ID) FROM #tmpAllContacts
