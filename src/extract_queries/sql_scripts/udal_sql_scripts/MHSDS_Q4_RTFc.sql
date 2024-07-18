@@ -1,6 +1,10 @@
 
 -- Script to return first contact (isolates new referrals each month and then calculates the days to their first appointment) during the previous 36-months
 
+IF OBJECT_ID('TempDB..#temp_Q3_First_Contact') IS NOT NULL DROP TABLE #temp_Q3_First_Contact
+IF OBJECT_ID('TempDB..#temp_Q3_First_Contact_Order') IS NOT NULL DROP TABLE #temp_Q3_First_Contact_Order
+
+
 DECLARE @EndRP INT;
 DECLARE @StartRP INT;
  
@@ -74,7 +78,7 @@ SELECT DISTINCT
     SERV.[ReferRejectReason],
     SERV.[AgeServReferClosure],
     SERV.[AgeServReferRejection],
-	ETH.[Main_Description_60_Chars] AS [Ethnic_Category_Main_Desc],
+    ETH.[Main_Description_60_Chars] AS [Ethnic_Category_Main_Desc],
     IMD.[IMD_Decile],
     REF_PROS.[Organisation_Name] AS [ODS_Prov_orgName],
     CARE.[CareContDate],
@@ -89,7 +93,7 @@ SELECT DISTINCT
     CASE WHEN COMM.[STP_Code] IN ('QWE', 'QKK') THEN 1 ELSE 0 END AS [SL_ICB_FLAG],
     CASE WHEN REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') THEN 1 ELSE 0 END AS [SL_PRO_FLAG]
 
-INTO #tempAW_New_Contacts
+INTO #temp_Q3_First_Contact
 FROM [Reporting_MESH_MHSDS].[MHS101Referral_Published] AS REF
 
 INNER JOIN [Reporting_MESH_MHSDS].[MHS001MPI_Published] AS MPI
@@ -136,13 +140,13 @@ AND CARE.[CareContDate] IS NOT NULL
 
 SELECT *,
 ROW_NUMBER() OVER(PARTITION BY [UniqServReqID], [UniqMonthID] ORDER BY [CareContDate]) AS [Order]
-INTO #tempAW_NP_Cont_Order
-FROM #tempAW_New_Contacts
+INTO #temp_Q3_First_Contact_Order
+FROM #temp_Q3_First_Contact
 
 SELECT *,
 DATEDIFF(DAY, [ReferralRequestReceivedDate], [CareContDate]) as [Days_First_Contact]
-FROM #tempAW_NP_Cont_Order
+FROM #temp_Q3_First_Contact_Order
 WHERE [Order] = 1
 
-DROP TABLE #tempAW_NP_Cont_Order
-DROP TABLE #tempAW_New_Contacts;
+DROP TABLE #temp_Q3_First_Contact_Order
+DROP TABLE #temp_Q3_First_Contact;

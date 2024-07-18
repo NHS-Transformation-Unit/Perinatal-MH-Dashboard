@@ -1,6 +1,9 @@
 
 -- Script to return perinatal access for specific South London providers during the previous 36-months
 
+IF OBJECT_ID('TempDB..#temp_Q1_Access') IS NOT NULL DROP TABLE #temp_Q1_Access
+
+
 DECLARE @EndRP INT;
 DECLARE @StartRP INT;
  
@@ -49,7 +52,7 @@ SELECT DISTINCT
     CASE WHEN COMM.[STP_Code] IN ('QWE', 'QKK') THEN 1 ELSE 0 END AS [SL_ICB_FLAG],
     CASE WHEN REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') THEN 1 ELSE 0 END AS [SL_PRO_FLAG]
 
-INTO #tmpAllContacts
+INTO #temp_Q1_Access
 FROM [Reporting_MESH_MHSDS].[MHS101Referral_Published] AS REF
 
 INNER JOIN [Reporting_MESH_MHSDS].[SubmissionFlags_Published] AS SF
@@ -97,7 +100,7 @@ AND CARE.[ConsMechanismMH] IN ('01', '11')
 AND CARE.[AttendStatus] IN ('5', '6')
 AND CARE.[CareContDate] >= '2023-04-01'
 
-SELECT [OrgIDProv],[ODS_Prov_orgName], COUNT(DISTINCT Der_Person_ID) FROM #tmpAllContacts
+SELECT [OrgIDProv],[ODS_Prov_orgName], COUNT(DISTINCT Der_Person_ID) FROM #temp_Q1_Access
 GROUP BY [OrgIDProv],[ODS_Prov_orgName]
 
-DROP TABLE #tmpAllContacts;
+DROP TABLE #temp_Q1_Access;

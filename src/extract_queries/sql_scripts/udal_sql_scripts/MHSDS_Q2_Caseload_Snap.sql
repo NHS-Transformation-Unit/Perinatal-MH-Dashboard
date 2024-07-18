@@ -1,6 +1,10 @@
 
 -- Script to return perinatal caseload for all English providers during the previous 12-months
 
+IF OBJECT_ID('TempDB..#temp_Q2_Caseload_Snap') IS NOT NULL DROP TABLE #temp_Q2_Caseload_Snap
+IF OBJECT_ID('TempDB..#temp_Q2_Caseload_Snap_Order') IS NOT NULL DROP TABLE #temp_Q2_Caseload_Snap_Order
+
+
 DECLARE @EndRP INT;
 
 SET @EndRP = (SELECT MAX(UniqMonthID)
@@ -47,7 +51,7 @@ SELECT DISTINCT
     CASE WHEN COMM.[STP_Code] IN ('QWE', 'QKK') THEN 1 ELSE 0 END AS [SL_ICB_FLAG],
     CASE WHEN REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') THEN 1 ELSE 0 END AS [SL_PRO_FLAG]
 
-INTO #tmp_AW_Caseload
+INTO #temp_Q2_Caseload_Snap
 FROM [Reporting_MESH_MHSDS].[MHS101Referral_Published] AS REF
 
 INNER JOIN [Reporting_MESH_MHSDS].[SubmissionFlags_Published] AS SF
@@ -98,13 +102,13 @@ AND CARE.[CareContDate] IS NOT NULL
 
 SELECT *,
 ROW_NUMBER() OVER(PARTITION BY [UniqServReqID], [UniqMonthID] ORDER BY [CareContDate]) AS [Order]
-INTO #tmp_AW_Caseload_Order
-FROM #tmp_AW_Caseload
+INTO #temp_Q2_Caseload_Snap_Order
+FROM #temp_Q2_Caseload_Snap
 
 SELECT *
-  FROM #tmp_AW_Caseload_Order
+  FROM #temp_Q2_Caseload_Snap_Order
 WHERE [Order] = 1
 AND [Count] = 1
 
-DROP TABLE #tmp_AW_Caseload
-DROP TABLE #tmp_AW_Caseload_Order;
+DROP TABLE #temp_Q2_Caseload_Snap
+DROP TABLE #temp_Q2_Caseload_Snap_Order;

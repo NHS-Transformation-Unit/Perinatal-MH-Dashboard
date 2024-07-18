@@ -1,5 +1,9 @@
 -- Script to return perinatal caseload for specific South London providers during the previous 36-months
 
+IF OBJECT_ID('TempDB..#temp_Q2_Caseload_Main') IS NOT NULL DROP TABLE #temp_Q2_Caseload_Main
+IF OBJECT_ID('TempDB..#temp_Q2_Caseload_Main_Order') IS NOT NULL DROP TABLE #temp_Q2_Caseload_Main_Order
+
+
 DECLARE @EndRP INT;
 DECLARE @StartRP INT;
  
@@ -49,7 +53,7 @@ SELECT DISTINCT
     CASE WHEN COMM.[STP_Code] IN ('QWE', 'QKK') THEN 1 ELSE 0 END AS [SL_ICB_FLAG],
     CASE WHEN REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') THEN 1 ELSE 0 END AS [SL_PRO_FLAG]
 
-INTO #tmp_AW_Caseload
+INTO #temp_Q2_Caseload_Main
 FROM [Reporting_MESH_MHSDS].[MHS101Referral_Published] AS REF
 
 INNER JOIN [Reporting_MESH_MHSDS].[SubmissionFlags_Published] AS SF
@@ -101,13 +105,13 @@ AND CARE.[CareContDate] IS NOT NULL
 
 SELECT *,
 ROW_NUMBER() OVER(PARTITION BY [UniqServReqID], [UniqMonthID] ORDER BY [CareContDate]) AS [Order]
-INTO #tmp_AW_Caseload_Order
-FROM #tmp_AW_Caseload
+INTO #temp_Q2_Caseload_Main_Order
+FROM #temp_Q2_Caseload_Main
 
 SELECT *
-FROM #tmp_AW_Caseload_Order
+FROM #temp_Q2_Caseload_Main_Order
 WHERE [Order] = 1
 AND [Count] = 1
 
-DROP TABLE #tmp_AW_Caseload
-DROP TABLE #tmp_AW_Caseload_Order;
+DROP TABLE #temp_Q2_Caseload_Main
+DROP TABLE #temp_Q2_Caseload_Main_Order;

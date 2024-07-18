@@ -1,3 +1,6 @@
+
+-- Script to return perinatal referrals for specific South London providers in the most recent month
+
 DECLARE @EndRP INT;
 DECLARE @StartRP INT;
  
@@ -126,4 +129,4 @@ ON REF.[OrgIDComm] = COMM.[Organisation_Code]
 WHERE REF.[UniqMonthID] = @EndRP
 AND SERV.[ServTeamTypeRefToMH] = 'C02'
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
-AND MPI.[Gender] = '2'
+AND MPI.[Gender] = '2';
