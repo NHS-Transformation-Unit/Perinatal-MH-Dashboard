@@ -109,7 +109,7 @@ INTO #temp_Q2_Caseload_Main_Order
 FROM #temp_Q2_Caseload_Main
 
 SELECT *
-FROM #temp_Q2_Caseload_Order
+FROM #temp_Q2_Caseload_Main_Order
 WHERE [Order] = 1
 AND [Count] = 1
 
