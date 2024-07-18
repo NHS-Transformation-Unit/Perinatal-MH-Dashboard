@@ -98,9 +98,9 @@ AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2'
 AND CARE.[ConsMechanismMH] IN ('01', '11')
 AND CARE.[AttendStatus] IN ('5', '6')
-AND CARE.[CareContDate] >= '2023-04-01'
+AND CARE.[CareContDate] >= '2023-04-01';
 
-SELECT [OrgIDProv],[ODS_Prov_orgName], COUNT(DISTINCT Der_Person_ID) FROM #temp_Q1_Access
-GROUP BY [OrgIDProv],[ODS_Prov_orgName]
+--SELECT [OrgIDProv],[ODS_Prov_orgName], COUNT(DISTINCT Der_Person_ID) FROM #temp_Q1_Access
+--GROUP BY [OrgIDProv],[ODS_Prov_orgName]
 
-DROP TABLE #temp_Q1_Access;
+--DROP TABLE #temp_Q1_Access;
