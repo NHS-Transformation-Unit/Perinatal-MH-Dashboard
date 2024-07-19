@@ -106,12 +106,4 @@ AND CARE.[CareContDate] IS NOT NULL
 SELECT *,
 ROW_NUMBER() OVER(PARTITION BY [UniqServReqID], [UniqMonthID] ORDER BY [CareContDate]) AS [Order]
 INTO #temp_Q2_Caseload_Main_Order
-FROM #temp_Q2_Caseload_Main
-
-SELECT *
-FROM #temp_Q2_Caseload_Main_Order
-WHERE [Order] = 1
-AND [Count] = 1
-
-DROP TABLE #temp_Q2_Caseload_Main
-DROP TABLE #temp_Q2_Caseload_Main_Order;
+FROM #temp_Q2_Caseload_Main;
