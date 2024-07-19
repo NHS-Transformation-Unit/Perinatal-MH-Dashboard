@@ -3,10 +3,9 @@
 
 
 ## Loading Q1 data and data lookup files
+
 DBI::dbExecute(con, statement = read_file(paste0(here(),"/src/extract_queries/sql_scripts/udal_sql_scripts/MHSDS_Q1_Access.sql")), immediate=TRUE)
-q1_main_raw_df <- DBI::dbGetQuery(con, statement = "SELECT [OrgIDProv],[ODS_Prov_orgName], COUNT(DISTINCT Der_Person_ID) 
-                                                  FROM #temp_Q1_Access
-                                                  GROUP BY [OrgIDProv],[ODS_Prov_orgName]")
+q1_main_raw_df <- DBI::dbGetQuery(con, statement = read_file(paste0(here(),"/src/extract_queries/sql_scripts/udal_sql_scripts/read_Q1_Access.sql")))
 
 date_lookup <- paste0(here(),"/data/supporting_data/Date_Code_Lookup.csv")
 date_code_df <- read.csv(date_lookup)
