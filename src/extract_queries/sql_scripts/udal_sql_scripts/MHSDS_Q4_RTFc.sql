@@ -141,12 +141,4 @@ AND CARE.[CareContDate] IS NOT NULL
 SELECT *,
 ROW_NUMBER() OVER(PARTITION BY [UniqServReqID], [UniqMonthID] ORDER BY [CareContDate]) AS [Order]
 INTO #temp_Q3_First_Contact_Order
-FROM #temp_Q3_First_Contact
-
-SELECT *,
-DATEDIFF(DAY, [ReferralRequestReceivedDate], [CareContDate]) as [Days_First_Contact]
-FROM #temp_Q3_First_Contact_Order
-WHERE [Order] = 1
-
-DROP TABLE #temp_Q3_First_Contact_Order
-DROP TABLE #temp_Q3_First_Contact;
+FROM #temp_Q3_First_Contact;
