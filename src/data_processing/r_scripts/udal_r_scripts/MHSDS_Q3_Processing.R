@@ -1,5 +1,5 @@
 
-# Script for prcessing all new, open and closed referrals to perinatal MH services across English providers for previous 36-months
+# Script for processing all new, open and closed referrals to perinatal MH services across English providers for previous 36-months
 
 ## Loading Q3 data and data lookup files
 
