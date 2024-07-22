@@ -36,7 +36,7 @@ SELECT DISTINCT
     REF.[ReferralRequestReceivedDate],
     REF.[SpecialisedMHServiceCode],
     REF.[SourceOfReferralMH],
-    REF.[OrgIDReferring],
+    REF.[OrgIDReferringOrg] AS [OrgIDReferring],
     REF.[ReferringCareProfessionalStaffGroup],
     REF.[ClinRespPriorityType],
     REF.[PrimReasonReferralMH],
