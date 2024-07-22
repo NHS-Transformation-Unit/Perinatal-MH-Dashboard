@@ -177,7 +177,7 @@ q5_eth_att_spec_df <- q5_dem_att_df %>%
   mutate(Metric = "Ethnicity - Provider Specific") %>%
   select(1, 6, 2, 3, 4, 5)
 
-q5_eth_att_combined <- rbind(q5_eth_total_df, q5_eth_spec_df)
+q5_eth_att_combined <- rbind(q5_eth_att_total_df, q5_eth_att_spec_df)
 
 q5_eth_att_combined <- q5_eth_att_combined %>%
   arrange(Month, Organisation_Name)
