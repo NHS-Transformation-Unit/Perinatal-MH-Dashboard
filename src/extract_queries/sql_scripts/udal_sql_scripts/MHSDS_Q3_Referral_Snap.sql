@@ -72,9 +72,7 @@ SELECT DISTINCT
     SERV.[AgeServReferClosure],
     SERV.[AgeServReferRejection],
     ETH.[Main_Description] AS [Ethnic_Category_Main_Desc],
-    MPI.[LSOA2011],
     IMD.[IMD_Decile],
-    MPI.[AgeRepPeriodEnd],
     REF_PROS.[Organisation_Name] AS [ODS_Prov_orgName],
 
     CASE WHEN (REF.[ServDischDate] IS NULL OR REF.[ServDischDate] > SF.[ReportingPeriodEndDate]) AND SERV.[ReferRejectionDate] IS NULL THEN 1 ELSE 0 END AS OpenReferrals,
