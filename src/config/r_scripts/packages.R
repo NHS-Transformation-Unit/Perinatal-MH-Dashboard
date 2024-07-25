@@ -9,7 +9,6 @@ packages <- c("here",
               "tidyr",
               "stringr",
               "openxlsx",
-              "readxl",
-              "dplyr")
+              "readxl")
 
 lapply(packages, library, character.only=TRUE)
