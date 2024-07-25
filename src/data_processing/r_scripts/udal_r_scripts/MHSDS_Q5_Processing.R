@@ -4,10 +4,9 @@
 
 ## Loading Q5 data and data lookup files
 
-MHSDS_q5_file_path <- paste0(here(),"/data/raw_extracts/MHSDS_Q5_Appointments.csv")
-date_lookup <- paste0(here(),"/data/supporting_data/Date_Code_Lookup.csv")
+q5_raw_df <- DBI::dbGetQuery(con, statement = read_file(paste0(here(),"/src/extract_queries/sql_scripts/udal_sql_scripts/MHSDS_Q5_App.sql")))
 
-q5_raw_df <- read.csv(MHSDS_q5_file_path)
+date_lookup <- paste0(here(),"/data/supporting_data/Date_Code_Lookup.csv")
 date_code_df <- read.csv(date_lookup)
 
 
@@ -138,7 +137,7 @@ q5_age_att_df <- q5_dem_att_df %>%
 
 app_groupby_fct <- function(input, metric, cat_desc) {
   result_df <- input %>%
-    group_by(Month, ICB_Flag, ODS_Prov_orgName, Appointment_Status) %>%
+    group_by(Month, SL_ICB_FLAG, ODS_Prov_orgName, Appointment_Status) %>%
     summarise(Referral_Count = n(), .groups = "drop") %>%
     rename(Organisation_Name = ODS_Prov_orgName) %>%
     mutate(Metric = metric,
@@ -187,7 +186,7 @@ write.csv(q5_eth_att_combined, paste0(here(),"/data/processed_extracts/MHSDS_Q5_
 
 ## Summarising the caseload each month based on the deprivation decile of referred patients
 
-q5_dep_att_total_df <- app_groupby_fct(q5_dem_spec_df, "Deprivation - Provider Total", "All Quintiles (Deprivation)")
+q5_dep_att_total_df <- app_groupby_fct(q5_dem_att_df, "Deprivation - Provider Total", "All Quintiles (Deprivation)")
 q5_dep_att_20_df <- app_groupby_fct(q5_dep_20, "Deprivation - Provider Specific", "First_Quintile (Deprivation)")
 q5_dep_att_40_df <- app_groupby_fct(q5_dep_40, "Deprivation - Provider Specific", "Second_Quintile (Deprivation)")
 q5_dep_att_60_df <- app_groupby_fct(q5_dep_60, "Deprivation - Provider Specific", "Third_Quintile (Deprivation)")
@@ -195,11 +194,11 @@ q5_dep_att_80_df <- app_groupby_fct(q5_dep_80, "Deprivation - Provider Specific"
 q5_dep_att_100_df <- app_groupby_fct(q5_dep_100, "Deprivation - Provider Specific", "Fifth_Quintile (Deprivation)")
 
 q5_dep_att_combined <- rbind(q5_dep_att_total_df, 
-                         q5_dep_att_20_df,
-                         q5_dep_att_40_df,
-                         q5_dep_att_60_df,
-                         q5_dep_att_80_df,
-                         q5_dep_att_100_df)
+                             q5_dep_att_20_df,
+                             q5_dep_att_40_df,
+                             q5_dep_att_60_df,
+                             q5_dep_att_80_df,
+                             q5_dep_att_100_df)
 
 q5_dep_att_combined <- q5_dep_att_combined %>%
   arrange(Month, Organisation_Name)
@@ -289,7 +288,7 @@ q5_age_con_df <- q5_dem_con_df %>%
 
 con_groupby_fct <- function(input, metric, cat_desc) {
   result_df <- input %>%
-    group_by(Month, ICB_Flag, ODS_Prov_orgName, Contact_Mech) %>%
+    group_by(Month, SL_ICB_FLAG, ODS_Prov_orgName, Contact_Mech) %>%
     summarise(Referral_Count = n(), .groups = "drop") %>%
     rename(Organisation_Name = ODS_Prov_orgName) %>%
     mutate(Metric = metric,
