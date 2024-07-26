@@ -102,7 +102,7 @@ ON REF.[RecordNumber] = MPI.[RecordNumber]
 LEFT JOIN [Reporting_MESH_MHSDS].[MHS102ServiceTypeReferredTo_Published] AS  SERV
 ON REF.[UniqServReqID] = SERV.[UniqServReqID] AND REF.[RecordNumber] = SERV.[RecordNumber] 
 
-INNER JOIN [Reporting_MESH_MHSDS].[SubmissionFlags_Published] AS SF
+INNER JOIN [Reporting_MESH_MHSDS].[MHSDS_SubmissionFlags_Published] AS SF
 ON REF.[NHSEUniqSubmissionID] = SF.[NHSEUniqSubmissionID]
 AND SF.[Der_IsLatest] = 'Y'
 
