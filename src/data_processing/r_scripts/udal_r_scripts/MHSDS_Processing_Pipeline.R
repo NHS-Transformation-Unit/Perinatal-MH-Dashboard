@@ -20,4 +20,4 @@ source(paste0(here(),"/src/data_processing/r_scripts/udal_r_scripts/MHSDS_Q5_Pro
 
 ## Drop all temporary tables in UDAL
 
-source(paste0(here(),"/src/extract_queries/sql_scripts/udal_r_scripts/drop_temp_tables"))
+source(paste0(here(),"/src/extract_queries/sql_scripts/udal_sql_scripts/drop_temp_tables.sql"))

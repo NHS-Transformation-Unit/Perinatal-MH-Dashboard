@@ -56,7 +56,7 @@ SELECT DISTINCT
 INTO #temp_Q2_Caseload_Main
 FROM [Reporting_MESH_MHSDS].[MHS101Referral_Published] AS REF
 
-INNER JOIN [Reporting_MESH_MHSDS].[SubmissionFlags_Published] AS SF
+INNER JOIN [Reporting_MESH_MHSDS].[MHSDS_SubmissionFlags_Published] AS SF
 ON REF.[NHSEUniqSubmissionID] = SF.[NHSEUniqSubmissionID]
 AND SF.[Der_IsLatest] = 'Y'
 
