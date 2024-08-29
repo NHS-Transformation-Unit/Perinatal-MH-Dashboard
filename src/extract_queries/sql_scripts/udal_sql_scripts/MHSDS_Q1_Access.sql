@@ -97,5 +97,5 @@ AND (REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') OR COMM.[STP_Code] IN ('QWE', 'QKK
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2'
 AND CARE.[ConsMechanismMH] IN ('01', '11')
-AND CARE.[AttendStatus] IN ('5', '6')
+AND CARE.[AttendOrDNACode] IN ('5', '6')
 AND CARE.[CareContDate] >= '2023-04-01';
