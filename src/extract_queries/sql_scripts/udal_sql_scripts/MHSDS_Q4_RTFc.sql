@@ -69,7 +69,7 @@ SELECT DISTINCT
     REF.[AgeServReferDischDate],
     SERV.[MHS102UniqID],
     SERV.[UniqCareProfTeamID],
-    SERV.[ServTeamTypeRefToMH],
+    COALESCE(SERV.[ServTeamTypeRefToMH],SERVTD.[ServTeamTypeMH]) AS ServTeamTypeRefToMH,
     SERV.[ReferClosureDate],
     SERV.[ReferClosureTime],
     SERV.[ReferRejectionDate],
@@ -128,14 +128,18 @@ AND REF.[UniqServReqID] = CARE.[UniqServReqID]
 LEFT JOIN [Reporting_UKHD_ODS].[Commissioner_Hierarchies_ICB] AS COMM
 ON REF.[OrgIDComm] = COMM.[Organisation_Code]
 
+LEFT JOIN [Reporting_MESH_MHSDS].[MHS902ServiceTeamDetails_Published] as SERVTD
+ON REF.[UniqCareProfTeamLocalID] = SERVTD.[UniqCareProfTeamLocalID]
+
+
 WHERE REF.[UniqMonthID] BETWEEN @StartRP AND @EndRP
-AND SERV.[ServTeamTypeRefToMH] = 'C02'
+AND (SERV.[ServTeamTypeRefToMH] = 'C02' OR SERVTD.[ServTeamTypeMH] = 'C02')
 AND (REF.[OrgIDProv] IN ('RV5', 'RPG', 'RQY') OR COMM.[STP_Code] IN ('QWE', 'QKK'))
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2'
 AND REF.[ReferralRequestReceivedDate] BETWEEN SF.[ReportingPeriodStartDate] AND SF.[ReportingPeriodEndDate]
 AND CARE.[ConsMechanismMH] IN ('01', '11')
-AND CARE.[AttendOrDNACode] IN ('5', '6')
+AND ((CARE.[AttendStatus] IN ('5', '6')) OR (CARE.[AttendOrDNACode] IN ('5', '6')))
 AND CARE.[CareContDate] IS NOT NULL
 
 SELECT *,

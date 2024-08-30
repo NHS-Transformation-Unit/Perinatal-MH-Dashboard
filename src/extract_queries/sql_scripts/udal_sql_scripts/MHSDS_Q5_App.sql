@@ -44,13 +44,13 @@ SELECT DISTINCT
     REF.[ServDischDate],
     SERV.[MHS102UniqID],
     SERV.[UniqCareProfTeamID],
-    SERV.[ServTeamTypeRefToMH],
+    COALESCE(SERV.[ServTeamTypeRefToMH],SERVTD.[ServTeamTypeMH]) AS ServTeamTypeRefToMH,
     ETH.[Main_Description_60_Chars] AS [Ethnic_Category_Main_Desc],
     IMD.[IMD_Decile],
     REF_PROS.[Organisation_Name] AS [ODS_Prov_orgName],
     CARE.[CareContDate],
     CARE.[ConsMechanismMH],
-    CARE.[AttendStatus] as [AttendOrDNACode],
+    COALESCE(CARE.[AttendStatus],CARE.[AttendOrDNACode]) AS [AttendOrDNACode],
     ATT_STAT.[Main_Description] as [Attendance_Status],
     COMM.[Organisation_Code],
     COMM.[Organisation_Name],
@@ -98,8 +98,11 @@ AND ATT_STAT.[Is_Latest] = '1'
 LEFT JOIN [Reporting_UKHD_ODS].[Commissioner_Hierarchies_ICB] AS COMM
 ON REF.[OrgIDComm] = COMM.[Organisation_Code]
 
+LEFT JOIN [Reporting_MESH_MHSDS].[MHS902ServiceTeamDetails_Published] as SERVTD
+ON REF.[UniqCareProfTeamLocalID] = SERVTD.[UniqCareProfTeamLocalID]
+
 WHERE REF.[UniqMonthID] BETWEEN @StartRP AND @EndRP
-AND SERV.[ServTeamTypeRefToMH] = 'C02'
+AND (SERV.[ServTeamTypeRefToMH] = 'C02' OR SERVTD.[ServTeamTypeMH] = 'C02')
 AND (REF.[OrgIDProv] IN ('RV5','RPG', 'RQY') OR COMM.[STP_Code] IN ('QWE', 'QKK'))
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2'

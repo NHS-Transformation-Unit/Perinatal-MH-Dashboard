@@ -62,7 +62,7 @@ SELECT DISTINCT
     REF.[AgeServReferDischDate],
     SERV.[MHS102UniqID],
     SERV.[UniqCareProfTeamID],
-    SERV.[ServTeamTypeRefToMH],
+    COALESCE(SERV.[ServTeamTypeRefToMH],SERVTD.[ServTeamTypeMH]) AS ServTeamTypeRefToMH,
     SERV.[ReferClosureDate],
     SERV.[ReferClosureTime],
     SERV.[ReferRejectionDate],
@@ -124,7 +124,11 @@ AND IMD.[Effective_Snapshot_Date] = '2019-12-31'
 LEFT JOIN [Reporting_UKHD_ODS].[Commissioner_Hierarchies_ICB] AS COMM
 ON REF.[OrgIDComm] = COMM.[Organisation_Code]
 
+LEFT JOIN [Reporting_MESH_MHSDS].[MHS902ServiceTeamDetails_Published] as SERVTD
+ON REF.[UniqCareProfTeamLocalID] = SERVTD.[UniqCareProfTeamLocalID]
+
+
 WHERE REF.[UniqMonthID] = @EndRP
-AND SERV.[ServTeamTypeRefToMH] = 'C02'
+AND (SERV.[ServTeamTypeRefToMH] = 'C02' OR SERVTD.[ServTeamTypeMH] = 'C02')
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2';
