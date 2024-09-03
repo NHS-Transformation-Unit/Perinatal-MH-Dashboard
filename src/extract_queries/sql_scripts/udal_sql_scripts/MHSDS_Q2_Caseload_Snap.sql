@@ -23,14 +23,14 @@ SELECT DISTINCT
     REF.[SourceOfReferralMH],
     REF.[OrgIDProv],
     REF_PROS.[Organisation_Name] AS [ODS_Prov_orgName], 
-    SERV.[ServTeamTypeRefToMH],
+    COALESCE(SERV.[ServTeamTypeRefToMH],SERVTD.[ServTeamTypeMH]) AS ServTeamTypeRefToMH,
     STYPE.[Main_Description],
     MPI.[EthnicCategory],
     ETH.[Main_Description_60_Chars] AS [Ethnic_Category_Main_Desc],
     MPI.[LSOA2011],
     IMD.[IMD_Decile],
     CARE.[CareContDate],
-    CARE.[AttendStatus] as [AttendOrDNACode],
+    COALESCE(CARE.[AttendStatus],CARE.[AttendOrDNACode]) AS [AttendOrDNACode],
     CARE.[ConsMechanismMH],
 
     CASE WHEN CARE.[CareContDate] > SF.[ReportingPeriodEndDate] THEN 0 
@@ -90,14 +90,17 @@ AND REF.[UniqServReqID] = DISC.[UniqServReqID]
 LEFT JOIN [Reporting_UKHD_ODS].[Commissioner_Hierarchies_ICB] AS COMM
 ON REF.[OrgIDComm] = COMM.[Organisation_Code]
 
+LEFT JOIN [Reporting_MESH_MHSDS].[MHS902ServiceTeamDetails_Published] as SERVTD
+ON REF.[UniqCareProfTeamLocalID] = SERVTD.[UniqCareProfTeamLocalID]
+
 WHERE REF.[UniqMonthID] = @EndRP
-AND SERV.[ServTeamTypeRefToMH] = 'C02'
+AND (SERV.[ServTeamTypeRefToMH] = 'C02' OR SERVTD.[ServTeamTypeMH] = 'C02')
 AND (MPI.[LADistrictAuth] IS NULL OR MPI.[LADistrictAuth] LIKE ('E%'))
 AND MPI.[Gender] = '2'
 AND (REF.[ServDischDate] IS NULL OR REF.[ServDischDate] > SF.[ReportingPeriodEndDate])
 AND DISC.[ReferRejectionDate] IS NULL
 AND CARE.[ConsMechanismMH] IN ('01', '11')
-AND CARE.[AttendStatus] IN ('5', '6')
+AND ((CARE.[AttendStatus] IN ('5', '6')) OR (CARE.[AttendOrDNACode] IN ('5', '6')))
 AND CARE.[CareContDate] IS NOT NULL
 
 SELECT *,
