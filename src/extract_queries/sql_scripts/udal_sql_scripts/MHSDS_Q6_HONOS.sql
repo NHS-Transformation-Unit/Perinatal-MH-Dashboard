@@ -296,9 +296,8 @@ FROM #TempDischarges as [Dis]
 INNER JOIN #TempAssCombScores as [AssScore]
 ON Dis.[Der_Person_ID] = AssScore.[Der_Person_ID]
 AND Dis.[UniqServReqID] = AssScore.[UniqServReqID]
-AND AssScore.[Der_AssToolCompDate] BETWEEN DIS.[ReferralRequestReceivedDate] AND CASE WHEN DIS.[ServDischDate] is Null THEN CAST(GETDATE() AS date)
-                                                                                        ELSE DIS.[ServDischDate]
-                                                                                 END
+AND AssScore.[Der_AssToolCompDate] BETWEEN DIS.[ReferralRequestReceivedDate] AND DIS.[ServDischDate]
+                                                                            
 
 -- =================================================================================
 -- Stage 6: Join Discharges to First Assessment and Last Assessments
@@ -309,7 +308,7 @@ SELECT Dis.*
 	   ,AssScoreFirst.[CombinedScore] AS [Der_FirstCombinedScore]
 	   ,AssScoreLast.[Der_AssToolCompDate] AS [Der_LastAssToolCompDate]
 	   ,AssScoreLast.[CombinedScore] AS [Der_LastCombinedScore]
-	   ,DATEDIFF(DAY, Dis.[ReferralRequestReceivedDate], CASE WHEN DIS.[ServDischDate] is Null THEN CAST(GETDATE() AS date) ELSE DIS.[ServDischDate] END) AS [ReferralDays]
+	   ,DATEDIFF(DAY, Dis.[ReferralRequestReceivedDate], DIS.[ServDischDate]) AS [ReferralDays]
 INTO #TempDisFirstLastAss
 FROM #TempDischarges as [Dis]
 
@@ -343,10 +342,5 @@ SELECT [Der_Person_ID]
 INTO #PairedHoNOS
 FROM #TempDisFirstLastAss
 
-
--- =================================================================================
--- Stage 7: Extract Paired HONOS table
--- =================================================================================
-
-SELECT *
-FROM #PairedHoNOS
+Select *
+From #PairedHoNOS
